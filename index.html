@@ -3,221 +3,109 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Toko Cari Barang - AI Foto V2 ANTI HILANG</title>
-<meta name="theme-color" content="#0b1e3a">
-  <link rel="manifest" href="manifest.json">
-<link rel="apple-touch-icon" href="icon-192.png">
-<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<title>ScanStock v3.5 - Tanpa SKU Kembar</title>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 <style>
-*{box-sizing:border-box}body{margin:0;font-family:system-ui,sans-serif;background:#f3f5f9}
-.top{position:sticky;top:0;z-index:50;background:#0b1e3a;color:#fff;padding:12px 14px;display:flex;gap:10px;align-items:center}
-.ham{width:44px;height:44px;border-radius:12px;border:0;background:#fff;font-size:22px;cursor:pointer}
-.logo{font-weight:900;font-size:18px;line-height:1}.logo small{display:block;font-weight:500;font-size:11px;opacity:.8}
-.badge{margin-left:auto;background:#00e5a0;color:#042;font-size:11px;font-weight:800;padding:6px 10px;border-radius:999px}
-.hero{padding:16px 14px 0}.card{background:#0b1e3a;border-radius:20px;padding:16px;color:#fff}
-.searchrow{display:flex;gap:8px}.searchrow input{flex:1;padding:15px 14px;border-radius:14px;border:0;font-size:16px;outline:none}
-.cam{width:54px;border-radius:14px;border:0;background:#fff;font-size:24px;cursor:pointer}
-.btnrow{display:flex;gap:8px;margin-top:10px}.btnrow button{flex:1;padding:14px;border:0;border-radius:14px;font-weight:900;font-size:14px;cursor:pointer}
-.green{background:#00e5a0}.yellow{background:#ffd600}.hint{font-size:11px;opacity:.75;text-align:center;margin-top:8px}
-.query{margin-top:12px;background:#fff;color:#111;border-radius:16px;padding:12px;display:none}.query img{width:100%;height:260px;object-fit:cover;border-radius:14px}
-.frame32{display:flex;gap:8px;align-items:center;margin:8px 0;font-size:12px}.frame32 img{width:32px;height:32px;object-fit:cover;border:2px solid #6d5cff;border-radius:6px}
-.result{display:flex;gap:12px;padding:12px;border:1px solid #eee;border-radius:16px;margin-bottom:10px;cursor:pointer;background:#fff}.result img{width:50%;aspect-ratio:1;object-fit:cover;border-radius:12px}
-.pct{font-weight:900;color:#0b1e3a}.alasan{font-size:12px;color:#666}
-.grid{padding:14px;display:grid;grid-template-columns:1fr 1fr;gap:12px}.item{background:#fff;border-radius:16px;overflow:hidden;cursor:pointer}.item img{width:100%;aspect-ratio:1;object-fit:cover;background:#eee}.item .p{padding:10px}.item b{font-size:13px;display:block}.item span{font-size:11px;color:#666}
-.drawer{position:fixed;inset:0;z-index:100;display:none}.backdrop{position:absolute;inset:0;background:rgba(0,0,0,.5)}.panel{position:absolute;left:0;top:0;bottom:0;width:280px;background:#fff;padding:18px}.panel button{width:100%;padding:13px;border-radius:12px;border:1px solid #eee;background:#f8f9ff;font-weight:700;margin-bottom:8px;text-align:left;cursor:pointer}
-.modal{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.6);display:none;overflow:auto}.sheet{max-width:640px;margin:14px auto;background:#fff;border-radius:20px;padding:18px}
-input{width:100%;padding:12px;border:1px solid #ddd;border-radius:12px;margin-bottom:10px;font-size:14px}.row{display:flex;gap:8px}.row>*{flex:1}
-.bulk{border:1px dashed #aaa;border-radius:14px;padding:10px;margin-bottom:10px;display:flex;gap:10px;align-items:center}.bulk img{width:72px;height:72px;object-fit:cover;border-radius:10px}.bulk input{margin:0}
-.chip{display:inline-block;background:#eef2ff;padding:6px 10px;border-radius:999px;font-size:12px;font-weight:700;margin:0 6px 6px 0}
-.safe{background:#e6ffef;border:1px solid #00e5a0;padding:10px;border-radius:12px;font-size:12px;color:#065f46;margin-bottom:10px}
-.danger{background:#fff1f2;border:1px solid #fda4af;padding:10px;border-radius:12px;font-size:12px;color:#881337;margin-bottom:10px}
+*{box-sizing:border-box}body{margin:0;background:#0f172a;color:#fff;font-family:system-ui;padding:12px}
+.top{display:flex;gap:10px;align-items:center}.logo{font-size:28px}h1{font-size:20px;margin:0}.small{font-size:12px;color:#94a3b8}
+.card2{background:#1e293b;border-radius:14px;padding:12px;margin:10px 0;display:flex;gap:10px;justify-content:space-around;text-align:center}.card2 b{font-size:20px;display:block}
+button{border:0;border-radius:12px;padding:12px 14px;font-weight:800;background:#7c3aed;color:#fff;margin:4px 0}button.ghost{background:#334155}button.green{background:#16a34a}
+input{width:100%;padding:13px;border-radius:12px;border:0;font-size:15px;margin:8px 0;color:#000}
+#grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.item{background:#1e293b;border-radius:14px;padding:10px;text-align:center}.item b{display:block;margin:6px 0 2px;font-size:13px}.price{color:#a78bfa;font-weight:800}.box{background:#1e293b;border-radius:14px;padding:14px;margin:10px 0}.hide{display:none}.sku{font-size:11px;color:#94a3b8}.rak{font-size:11px;color:#fbbf24}
+#status{font-size:12px;color:#fbbf24}
 </style>
 </head>
 <body>
-<div class="top"><button class="ham" onclick="document.getElementById('drawer').style.display='block'">☰</button><div class="logo">TOKO CARI BARANG<small>V2 Anti Hilang • Auto Backup</small></div><div class="badge" id="countBadge">0 barang</div></div>
-<div class="drawer" id="drawer"><div class="backdrop" onclick="document.getElementById('drawer').style.display='none'"></div><div class="panel"><h2>☰ Menu</h2><button onclick="document.getElementById('drawer').style.display='none';window.scrollTo({top:0,behavior:'smooth'})">🏠 Beranda / Pencarian</button><button onclick="document.getElementById('drawer').style.display='none';document.getElementById('adminModal').style.display='block'">🔐 Katalog Admin (PIN)</button><div style="font-size:11px;color:#999">PIN default: 1234 • Semua data di IndexedDB V2 + Auto Backup</div></div></div>
-<div class="hero"><div class="card"><div class="searchrow"><input id="searchInput" placeholder="Cari barang... ketik nama / SKU" oninput="render()"><button class="cam" onclick="document.getElementById('fotoInput').click()">📷</button><input type="file" id="fotoInput" accept="image/*" hidden onchange="cariPakeFotoAI(event)"></div><div class="btnrow"><button class="green" onclick="openScan()">📷 SCAN BARCODE</button><button class="yellow" onclick="document.getElementById('fotoInput').click()">🖼️ CARI PAKE FOTO</button></div><div class="hint">Hasil diurutkan AI dari paling mirip.</div><div id="scanBox" style="display:none;margin-top:12px"><div id="reader"></div><button onclick="closeScan()" style="width:100%;margin-top:8px;padding:12px;border-radius:12px;border:0">Tutup Scanner</button></div><div class="query" id="queryBox"><b>🔍 Hasil Cari Pake Foto</b><img id="queryImg"><div class="frame32"><img id="frame32Img"><span>Frame 32x32 • AI liat bentuk + pola warna lengkap</span></div><div id="statusAI" style="font-size:12px;color:#555"></div><div id="hasilAI"></div></div></div></div>
-<div id="grid" class="grid"></div><div id="empty" style="text-align:center;padding:30px;color:#888;display:none">Belum ada barang. Buka ☰ > Admin untuk import Excel.</div>
-<div class="modal" id="adminModal"><div class="sheet"><h2>🔐 Admin - V2 Anti Hilang</h2>
-<div class="safe">✅ <b>AMAN:</b> Semua barang + foto kesimpen di 1 database IndexedDB. Tiap ada perubahan, backup otomatis dibuat. Data tidak akan hilang walau lu tutup Chrome.</div>
-<div id="pinBox"><input type="password" id="pinInput" placeholder="PIN Admin (default 1234)"><button style="background:#0b1e3a;color:#fff;border:0;padding:13px;border-radius:12px;width:100%;font-weight:800" onclick="cekPin()">Masuk Admin</button><button onclick="document.getElementById('adminModal').style.display='none'" style="background:#eee;border:0;padding:12px;border-radius:12px;width:100%;margin-top:8px">Tutup</button></div>
-<div id="adminBody" style="display:none"><div><span class="chip" id="statBarang">0 barang</span><span class="chip" id="statFoto">0 ada foto</span><span class="chip" id="statBackup">Backup: -</span></div>
-<label>API Key Gemini</label><input type="password" id="geminiKey" placeholder="AIza..." onchange="saveSetting('geminiKey',this.value)">
-<label>Ganti PIN Admin</label><div class="row"><input id="newPin" placeholder="PIN baru"><button onclick="gantiPin()" style="background:#0b1e3a;color:#fff;border:0;border-radius:12px">Ganti</button></div>
-<hr><h3>🛡️ BACKUP & PULIHIN - PALING PENTING</h3>
-<p style="font-size:12px;color:#666">Ini yang bikin data lu tidak ilang lagi. Habis input barang, klik Backup. Kalau pindah HP / pindah link, klik Pulihin.</p>
-<button onclick="exportBackupFull()" style="background:#0b1e3a;color:#fff;border:0;padding:13px;border-radius:12px;width:100%;font-weight:900">⬇️ BACKUP LENGKAP (Barang + Foto)</button>
-<div style="margin-top:8px"><label style="font-size:12px">Pulihin dari file backup:</label><input type="file" id="importBackupInput" accept=".json" onchange="importBackupFull(event)"></div>
-<button onclick="exportCSV()" style="background:#eee;border:0;padding:12px;border-radius:12px;width:100%;margin-top:8px">⬇️ Export CSV Saja (Tanpa Foto)</button>
-<hr><h3>➕ Tambah Barang Manual</h3><input id="f_sku" placeholder="SKU *"><input id="f_nama" placeholder="Nama barang *"><div class="row"><input id="f_harga" placeholder="Harga"><input id="f_stok" placeholder="Stok"></div><input id="f_rak" placeholder="Rak / Lokasi"><input type="file" id="f_foto" accept="image/*"><button onclick="tambahManual()" style="background:#00e5a0;border:0;padding:13px;border-radius:12px;width:100%;font-weight:900">+ Tambah Barang</button>
-<hr><h3>📥 Import Excel / CSV</h3><input type="file" id="excelInput" accept=".xlsx,.xls,.csv" onchange="importExcel(event)">
-<hr><h3>🖼️ Upload Foto Massal (Tanpa Rename)</h3><p style="font-size:12px;color:#666">Pilih banyak foto, ketik SKU di tiap foto, Save. Foto langsung nempel.</p><input type="file" id="bulkInput" accept="image/*" multiple onchange="previewBulk(event)"><div id="bulkList"></div><button id="bulkSave" onclick="saveBulk()" style="display:none;background:#ffd600;border:0;padding:13px;border-radius:12px;width:100%;font-weight:900">💾 Simpan Semua Foto</button>
-<hr><h3>📦 Katalog</h3><input placeholder="Cari di katalog admin..." oninput="renderAdminList(this.value)"><div id="adminList"></div>
-<div class="danger">⚠️ Tombol Hapus di bawah ini akan menghapus SEMUA data permanen. Jangan ditekan kalau tidak yakin.</div>
-<button onclick="hapusSemuaConfirm()" style="background:#ffe1e1;border:0;padding:12px;border-radius:12px;width:100%;font-weight:800;color:#991b1b">🗑️ Hapus Semua Data (Harus Ketik HAPUS)</button>
-<button onclick="document.getElementById('adminBody').style.display='none';document.getElementById('pinBox').style.display='block';document.getElementById('adminModal').style.display='none'" style="background:#eee;border:0;padding:12px;border-radius:12px;width:100%;margin-top:8px">Keluar Admin</button>
-</div></div></div>
+<div class="top"><div class="logo">📦</div><div><h1>ScanStock v3.5</h1><div class="small">Cari Barang + Foto + Barcode - Tanpa SKU Kembar</div></div></div>
+<div class="card2"><div><b id="jml">0</b>Barang</div><div><b id="jmlTampil">0</b>Ditemukan</div><div><b id="jmlStok">0</b>Total Stok</div></div>
+<div id="status" class="box">⏳ Loading data.xlsx... Tunggu sebentar...</div>
+<input id="searchInput" placeholder="Cari barang / SKU / Rak..." oninput="tampil()">
+<div><button onclick="scanBarcode()">📷 SCAN BARCODE</button> <button onclick="document.getElementById('fileFoto').click()" class="green">🖼️ CARI PAKAI FOTO v3.5</button></div>
+<input type="file" id="fileFoto" accept="image/*" onchange="cariFoto(this)" class="hide">
+<div id="hasilFoto" class="box hide"></div>
+<div id="grid"></div>
+<div id="kosong" class="box">Belum ada data. Pastikan file data.xlsx sudah di-upload ke GitHub.</div>
 <script>
-var products = [];
-var fotoMap = {};
-var settings = {};
-var bulkFiles = [];
-var qr = null;
-var db = null;
-
-// === DATABASE V2 - SEMUA DI 1 TEMPAT ===
-function bukaDB(){
-  return new Promise(function(res){
-    var req = indexedDB.open('tokoDB_V2', 2);
-    req.onupgradeneeded = function(){
-      var d = req.result;
-      if(!d.objectStoreNames.contains('foto')) d.createObjectStore('foto');
-      if(!d.objectStoreNames.contains('produk')) d.createObjectStore('produk');
-      if(!d.objectStoreNames.contains('setting')) d.createObjectStore('setting');
-    };
-    req.onsuccess = function(){ db = req.result; res(); };
-    req.onerror = function(){ res(); };
-  });
-}
-function idbPut(store,key,val){ return new Promise(function(res){ if(!db){res();return;} var tx=db.transaction(store,'readwrite'); tx.objectStore(store).put(val,key); tx.oncomplete=function(){res();}; tx.onerror=function(){res();}; }); }
-function idbGetAll(store){ return new Promise(function(res){ if(!db){res({});return;} var tx=db.transaction(store,'readonly'); var req=tx.objectStore(store).openCursor(); var out={}; req.onsuccess=function(){ var c=req.result; if(c){ out[c.key]=c.value; c.continue(); } else res(out); }; req.onerror=function(){res({});}; }); }
-function idbDelete(store,key){ if(!db) return; var tx=db.transaction(store,'readwrite'); tx.objectStore(store).delete(key); }
-function idbClear(store){ if(!db) return; var tx=db.transaction(store,'readwrite'); tx.objectStore(store).clear(); }
-
-async function loadSemua(){
-  var p = await idbGetAll('produk');
-  products = Object.values(p);
-  fotoMap = await idbGetAll('foto');
-  settings = await idbGetAll('setting');
-  // MIGRASI OTOMATIS dari versi lama kalau masih ada
+let barang=[];
+async function loadData(){
   try{
-    var lama = localStorage.getItem('toko_products');
-    if(lama && products.length===0){
-      var arr = JSON.parse(lama);
-      for(var i=0;i<arr.length;i++) await idbPut('produk', arr[i].sku, arr[i]);
-      products = arr;
-      localStorage.removeItem('toko_products');
+    let r=await fetch('data.xlsx');
+    if(!r.ok) throw new Error('data.xlsx tidak ketemu');
+    let buf=await r.arrayBuffer();
+    let wb=XLSX.read(buf,{type:'array'});
+    let ws=wb.Sheets[wb.SheetNames[0]];
+    let rows=XLSX.utils.sheet_to_json(ws,{header:1,defval:''});
+    barang=[];
+    let sudahAda=new Set();
+    let dibuang=0;
+    for(let i=1;i<rows.length;i++){
+      let row=rows[i];
+      let sku=String(row[0]||'').trim();
+      let nama=String(row[1]||row[2]||'').trim();
+      if(!nama && !sku) continue;
+      // SKU KEMBAR JANGAN DIAJAK - kalau udah ada, skip
+      if(sku){
+        if(sudahAda.has(sku)){ dibuang++; continue; }
+        sudahAda.add(sku);
+      }
+      let harga=Number(row[3])||0;
+      let stok=Number(row[4])||0;
+      let rak=String(row[5]||'').trim();
+      barang.push({id:i,sku:sku,nama:nama,harga:harga,stok:stok,rak:rak});
     }
-    var k = localStorage.getItem('geminiKey'); if(k && !settings.geminiKey) await idbPut('setting','geminiKey',k);
-    var pin = localStorage.getItem('adminPin'); if(pin && !settings.adminPin) await idbPut('setting','adminPin',pin);
-    settings = await idbGetAll('setting');
-  }catch(e){}
+    document.getElementById('status').innerHTML='✅ Data ke-load: <b>'+barang.length+' barang</b> | SKU kembar dibuang: '+dibuang+' | Dari total baris: '+(rows.length-1);
+    document.getElementById('jml').innerText=barang.length;
+    document.getElementById('jmlStok').innerText=barang.reduce((a,b)=>a+Number(b.stok||0),0);
+    tampil();
+  }catch(e){
+    document.getElementById('status').innerHTML='❌ Gagal load: '+e.message+'<br>Pastikan file namanya <b>data.xlsx</b> dan satu folder dengan index.html';
+  }
 }
-async function saveProdukKeDB(){ for(var i=0;i<products.length;i++) await idbPut('produk', products[i].sku, products[i]); await autoBackupSilent(); }
-async function saveSetting(k,v){ settings[k]=v; await idbPut('setting',k,v); }
-function updateStat(){
-  document.getElementById('statBarang').innerText = products.length+' barang';
-  document.getElementById('statFoto').innerText = Object.keys(fotoMap).length+' ada foto';
-  document.getElementById('countBadge').innerText = products.length+' barang';
-  var last = settings.lastBackup || '-';
-  var el=document.getElementById('statBackup'); if(el) el.innerText='Backup: '+last;
+function tampil(){
+  let q=document.getElementById('searchInput').value.toLowerCase().trim();
+  let g=document.getElementById('grid');
+  g.innerHTML='';
+  let list=barang;
+  if(q) list=barang.filter(b=>(b.nama+' '+b.sku+' '+b.rak).toLowerCase().includes(q));
+  document.getElementById('jmlTampil').innerText=list.length;
+  document.getElementById('kosong').style.display=list.length?'none':'block';
+  list.slice(0,200).forEach(b=>{
+    let d=document.createElement('div');d.className='item';
+    d.innerHTML='<b>'+b.nama+'</b><div class="sku">SKU: '+b.sku+'</div><div class="price">Rp '+Number(b.harga).toLocaleString('id-ID')+'</div><div>Stok: '+b.stok+'</div><div class="rak">📍 '+(b.rak||'-')+'</div>';
+    g.appendChild(d);
+  });
+  if(list.length>200) g.innerHTML+='<div class="box">Menampilkan 200 dari '+list.length+' hasil. Ketik lebih spesifik untuk mempersempit.</div>';
 }
-function cekPin(){
-  var pin=document.getElementById('pinInput').value;
-  var saved=settings.adminPin||'1234';
-  if(pin===saved){ document.getElementById('pinBox').style.display='none'; document.getElementById('adminBody').style.display='block'; document.getElementById('geminiKey').value=settings.geminiKey||''; updateStat(); renderAdminList(''); } else alert('PIN salah! Default 1234');
+function scanBarcode(){
+  let kode=prompt('Scan / Ketik Barcode / SKU:');
+  if(!kode) return;
+  document.getElementById('searchInput').value=kode;
+  tampil();
+  let ketemu=barang.filter(b=>b.sku==kode.trim());
+  if(ketemu.length) alert('Ketemu: '+ketemu[0].nama+' - Rp '+ketemu[0].harga);
+  else alert('SKU '+kode+' tidak ketemu di '+barang.length+' barang.');
 }
-async function gantiPin(){ var p=document.getElementById('newPin').value.trim(); if(!p) return alert('Isi PIN baru'); await saveSetting('adminPin',p); alert('PIN diganti jadi '+p); }
-function render(){
-  var q=(document.getElementById('searchInput').value||'').toLowerCase();
-  var list=[]; for(var i=0;i<products.length;i++){ var p=products[i]; if((p.nama+' '+p.sku+' '+(p.rak||'')).toLowerCase().indexOf(q)!==-1) list.push(p); }
-  document.getElementById('empty').style.display=list.length?'none':'block';
-  var html='';
-  for(var j=0;j<Math.min(60,list.length);j++){ var b=list[j]; var foto=fotoMap[b.sku]||''; html+='<div class="item"><img src="'+foto+'" onerror="this.src=\'https://via.placeholder.com/400?text='+encodeURIComponent(b.nama)+'\'"><div class="p"><b>'+b.nama+'</b><span>SKU: '+b.sku+' '+(b.rak||'')+'</span></div></div>'; }
-  document.getElementById('grid').innerHTML=html;
-  if(list.length>60) document.getElementById('grid').innerHTML+='<div style="grid-column:1/-1;text-align:center;color:#888;font-size:12px">Nampilin 60 dari '+list.length+' barang. Ketik nama / SKU buat nyaring.</div>';
-}
-async function tambahManual(){
-  var sku=document.getElementById('f_sku').value.trim().toUpperCase(); var nama=document.getElementById('f_nama').value.trim();
-  if(!sku||!nama) return alert('SKU & Nama wajib!');
-  var obj={sku:sku,nama:nama,harga:document.getElementById('f_harga').value,stok:document.getElementById('f_stok').value,rak:document.getElementById('f_rak').value};
-  var f=document.getElementById('f_foto').files[0];
-  var selesai=async function(){ var found=-1; for(var i=0;i<products.length;i++) if(products[i].sku===sku) found=i; if(found>=0) products[found]=obj; else products.push(obj); await idbPut('produk',sku,obj); await autoBackupSilent(); render(); renderAdminList(''); updateStat(); alert('Berhasil! '+nama+' ke-save permanen + auto backup dibuat'); document.getElementById('f_sku').value=''; document.getElementById('f_nama').value=''; };
-  if(f){ var r=new FileReader(); r.onload=async function(e){ var kecil=await kecilin(e.target.result,800); var dataUrl='data:image/jpeg;base64,'+kecil; fotoMap[sku]=dataUrl; await idbPut('foto',sku,dataUrl); selesai(); }; r.readAsDataURL(f); } else selesai();
-}
-async function importExcel(e){
-  var f=e.target.files[0]; if(!f) return;
-  var r=new FileReader(); r.onload=async function(ev){
-    var wb=XLSX.read(ev.target.result,{type:'array'}); var rows=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]); var n=0;
-    for(var i=0;i<rows.length;i++){ var row=rows[i]; var sku=String(row.sku||row.SKU||'').trim().toUpperCase(); var nama=row.nama||row.Nama||''; if(!sku||!nama) continue; var obj={sku:sku,nama:String(nama),harga:row.harga||row.Harga||'',stok:row.stok||row.Stok||'',rak:row.rak||row.Rak||''}; var found=-1; for(var j=0;j<products.length;j++) if(products[j].sku===sku) found=j; if(found>=0) products[found]=obj; else products.push(obj); await idbPut('produk',sku,obj); n++; }
-    await autoBackupSilent(); render(); renderAdminList(''); updateStat(); alert('Import berhasil: '+n+' barang. Foto lama TIDAK dihapus. Sekarang upload fotonya di bawah. Backup otomatis dibuat.');
-  }; r.readAsArrayBuffer(f);
-}
-function exportCSV(){
-  var csv='sku,nama,harga,stok,rak\n'; for(var i=0;i<products.length;i++){ var p=products[i]; csv+=p.sku+','+p.nama+','+p.harga+','+p.stok+','+p.rak+'\n'; }
-  var a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'})); a.download='template-barang.csv'; a.click();
-}
-// === BACKUP LENGKAP - INI KUNCINYA ===
-async function exportBackupFull(){
-  var data={versi:'V2',tanggal:new Date().toLocaleString('id-ID'),products:products,fotoMap:fotoMap,settings:settings};
-  var blob=new Blob([JSON.stringify(data)],{type:'application/json'});
-  var a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='backup-toko-'+new Date().toISOString().slice(0,10)+'.json'; a.click();
-  await saveSetting('lastBackup', new Date().toLocaleString('id-ID')); updateStat();
-  alert('Backup lengkap berhasil! Simpen file ini baik-baik. Isinya '+products.length+' barang + '+Object.keys(fotoMap).length+' foto.');
-}
-async function autoBackupSilent(){
-  // Simpen tanggal backup terakhir, file backup lengkap bisa di-download kapan aja dari tombol di atas
-  await idbPut('setting','lastBackup', new Date().toLocaleString('id-ID'));
-  updateStat();
-}
-async function importBackupFull(e){
-  var f=e.target.files[0]; if(!f) return;
-  if(!confirm('Pulihin backup ini? Data yang sekarang akan digabung (foto lama tidak dihapus, yang sama akan di-update). Lanjut?')) return;
-  var txt=await f.text(); try{ var data=JSON.parse(txt); }catch(err){ return alert('File backup rusak / bukan JSON'); }
-  var nP=0, nF=0;
-  var list=data.products||data.barang||[];
-  for(var i=0;i<list.length;i++){ var p=list[i]; var found=-1; for(var j=0;j<products.length;j++) if(products[j].sku===p.sku) found=j; if(found>=0) products[found]=p; else products.push(p); await idbPut('produk',p.sku,p); nP++; }
-  var fm=data.fotoMap||data.foto||{};
-  for(var k in fm){ fotoMap[k]=fm[k]; await idbPut('foto',k,fm[k]); nF++; }
-  if(data.settings) for(var s in data.settings){ settings[s]=data.settings[s]; await idbPut('setting',s,data.settings[s]); }
-  await autoBackupSilent(); render(); renderAdminList(''); updateStat();
-  alert('Pulih berhasil! '+nP+' barang + '+nF+' foto balik semua.');
-}
-function previewBulk(e){
-  bulkFiles=[]; for(var i=0;i<e.target.files.length;i++) bulkFiles.push(e.target.files[i]);
-  var html=''; for(var j=0;j<bulkFiles.length;j++){ var url=URL.createObjectURL(bulkFiles[j]); html+='<div class="bulk"><img src="'+url+'"><div style="flex:1"><div style="font-size:12px">'+bulkFiles[j].name+'</div><input id="bulkSku_'+j+'" placeholder="Ketik SKU (contoh 8971790 BG09-08)"></div></div>'; }
-  document.getElementById('bulkList').innerHTML=html; document.getElementById('bulkSave').style.display='block';
-}
-async function saveBulk(){
-  var ok=0;
-  for(var i=0;i<bulkFiles.length;i++){ var sku=document.getElementById('bulkSku_'+i).value.trim().toUpperCase(); if(!sku) continue; var dataUrl=await new Promise(function(res){ var r=new FileReader(); r.onload=async function(e){ var kecil=await kecilin(e.target.result,800); res('data:image/jpeg;base64,'+kecil); }; r.readAsDataURL(bulkFiles[i]); }); fotoMap[sku]=dataUrl; await idbPut('foto',sku,dataUrl); var ada=false; for(var k=0;k<products.length;k++) if(products[k].sku===sku) ada=true; if(!ada){ var np={sku:sku,nama:sku,harga:'',stok:'',rak:''}; products.push(np); await idbPut('produk',sku,np); } ok++; }
-  await autoBackupSilent(); render(); renderAdminList(''); updateStat(); alert('Berhasil simpan '+ok+' foto permanen! Jangan lupa klik BACKUP LENGKAP di atas biar ada file cadangannya.'); document.getElementById('bulkList').innerHTML=''; document.getElementById('bulkSave').style.display='none';
-}
-function renderAdminList(q){ q=(q||'').toLowerCase(); var html=''; for(var i=0;i<products.length;i++){ var p=products[i]; if((p.nama+' '+p.sku).toLowerCase().indexOf(q)===-1) continue; var foto=fotoMap[p.sku]||''; html+='<div style="display:flex;gap:10px;align-items:center;border:1px solid #eee;padding:8px;border-radius:12px;margin-bottom:8px"><img src="'+foto+'" style="width:56px;height:56px;object-fit:cover;border-radius:8px;background:#eee"><div style="flex:1"><b style="font-size:13px">'+p.nama+'</b><div style="font-size:11px;color:#666">SKU '+p.sku+' '+(foto?'✅ ada foto':'❌ belum ada foto')+'</div></div><button onclick="hapusBarang(\''+p.sku+'\')" style="width:auto;padding:8px 10px;background:#ffe1e1;border:0;border-radius:8px">Hapus</button></div>'; if(html.length>20000) break; } if(!html) html='<p style="font-size:13px;color:#888">Belum ada barang</p>'; document.getElementById('adminList').innerHTML=html; }
-async function hapusBarang(sku){ if(!confirm('Hapus '+sku+'?')) return; var baru=[]; for(var i=0;i<products.length;i++) if(products[i].sku!==sku) baru.push(products[i]); products=baru; delete fotoMap[sku]; idbDelete('produk',sku); idbDelete('foto',sku); await autoBackupSilent(); render(); renderAdminList(''); updateStat(); }
-async function hapusSemuaConfirm(){ var c=prompt('Ketik HAPUS untuk hapus semua data permanen:'); if(c!=='HAPUS') return alert('Dibatalkan. Data aman.'); products=[]; fotoMap={}; idbClear('produk'); idbClear('foto'); await autoBackupSilent(); render(); renderAdminList(''); updateStat(); alert('Semua data dihapus.'); }
-function openScan(){ document.getElementById('scanBox').style.display='block'; qr=new Html5Qrcode('reader'); qr.start({facingMode:'environment'},{fps:10,qrbox:250},function(txt){ document.getElementById('searchInput').value=txt; render(); closeScan(); }); }
-function closeScan(){ if(qr) qr.stop(); document.getElementById('scanBox').style.display='none'; }
-function getSidik32(url){ return new Promise(function(res){ var img=new Image(); img.onload=function(){ var c=document.createElement('canvas'); c.width=32; c.height=32; var ctx=c.getContext('2d'); ctx.drawImage(img,0,0,32,32); var d=ctx.getImageData(0,0,32,32).data; var a=[]; for(var i=0;i<d.length;i+=4){ a.push(d[i]); a.push(d[i+1]); a.push(d[i+2]); } res(a); }; img.src=url; }); }
-function skor32(a,b){ var t=0; for(var i=0;i<a.length;i++) t+=Math.abs(a[i]-b[i]); return t/a.length; }
-function kecilin(url,max){ return new Promise(function(res){ var img=new Image(); img.onload=function(){ var s=Math.min(1,max/img.width); var c=document.createElement('canvas'); c.width=img.width*s; c.height=img.height*s; c.getContext('2d').drawImage(img,0,0,c.width,c.height); res(c.toDataURL('image/jpeg',0.75).split(',')[1]); }; img.src=url; }); }
-async function cariPakeFotoAI(e){
-  var file=e.target.files[0]; if(!file) return;
-  var key=settings.geminiKey||''; if(!key){ alert('Isi API Key Gemini dulu di Admin!'); document.getElementById('adminModal').style.display='block'; return; }
-  var url=await new Promise(function(r){ var fr=new FileReader(); fr.onload=function(ev){ r(ev.target.result); }; fr.readAsDataURL(file); });
-  var box=document.getElementById('queryBox'); box.style.display='block'; document.getElementById('queryImg').src=url; document.getElementById('frame32Img').src=url; document.getElementById('statusAI').innerText='AI lagi nyaring...'; document.getElementById('hasilAI').innerHTML='<div style="padding:12px;text-align:center">AI lagi ngeliat bentuk + pola warna...</div>'; box.scrollIntoView({behavior:'smooth'});
-  var barang=[]; for(var i=0;i<products.length;i++) if(fotoMap[products[i].sku]) barang.push(products[i]);
-  if(!barang.length){ document.getElementById('statusAI').innerText='Belum ada foto barang. Upload foto dulu di Admin > Upload Foto Massal.'; return; }
-  var sidik=await getSidik32(url); var skor=[]; for(var j=0;j<barang.length;j++){ var s=await getSidik32(fotoMap[barang[j].sku]); skor.push({b:barang[j],skor:skor32(sidik,s)}); }
-  skor.sort(function(a,b){ return a.skor-b.skor; }); var kandidat=[]; for(var k=0;k<Math.min(8,skor.length);k++) kandidat.push(skor[k].b);
-  document.getElementById('statusAI').innerText='Udah dapet 8 kandidat dari '+barang.length+' foto, AI lagi ngeliat fotonya...';
-  var fotoKecil=await kecilin(url,512); var daftar=''; for(var m=0;m<kandidat.length;m++) daftar+=(m+1)+'. SKU:'+kandidat[m].sku+' Nama:'+kandidat[m].nama+' | ';
-  var parts=[]; parts.push({text:'Foto pertama = foto dicari. 8 foto berikutnya = kandidat ('+daftar+'). Bandingkan BENTUK, POLA WARNA LENGKAP, GAGANG, TEKSTUR, JENIS BARANG. Jangan hanya warna dominan. Balas HANYA JSON: {"hasil":[{"sku":"SKU","nama":"Nama","alasan":"sebutin bentuk + pola warnanya 1 kalimat","persen":85},{"sku":"...","nama":"...","alasan":"...","persen":70},{"sku":"...","nama":"...","alasan":"...","persen":60},{"sku":"...","nama":"...","alasan":"...","persen":55},{"sku":"...","nama":"...","alasan":"...","persen":50}]} Urutkan dari persen terbesar.'});
-  parts.push({inline_data:{mime_type:'image/jpeg',data:fotoKecil}});
-  for(var n=0;n<kandidat.length;n++){ var kecil=await kecilin(fotoMap[kandidat[n].sku],256); parts.push({inline_data:{mime_type:'image/jpeg',data:kecil}}); }
+async function cariFoto(el){
+  if(!el.files[0]) return;
+  let box=document.getElementById('hasilFoto');box.classList.remove('hide');
+  box.innerHTML='⏳ v3.5 lagi baca foto... (OCR)';
   try{
-    var resp=await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent?key='+key,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts:parts}]})});
-    var data=await resp.json(); if(data.error){ document.getElementById('statusAI').innerText='Error AI: '+data.error.message; return; }
-    var teks=data.candidates[0].content.parts[0].text.replace(/```json/g,'').replace(/```/g,'').trim(); var j=JSON.parse(teks); var hasil=j.hasil||[]; if(!hasil.length){ document.getElementById('statusAI').innerText='AI gak nemu yang mirip.'; return; }
-    var map={}; for(var p=0;p<kandidat.length;p++) map[kandidat[p].sku]=kandidat[p];
-    document.getElementById('statusAI').innerText='✅ AI udah ngeliat 8 foto. Paling atas '+hasil[0].nama;
-    var html='<div style="font-weight:800;margin:8px 0">Tap yang paling mirip:</div>';
-    for(var q=0;q<hasil.length;q++){ var h=hasil[q]; var b=map[h.sku]||{}; html+='<div class="result" onclick="document.getElementById(\'searchInput\').value=\''+h.sku+'\';render();document.getElementById(\'queryBox\').style.display=\'none\'"><img src="'+(fotoMap[h.sku]||'')+'"><div style="flex:1"><b>'+h.nama+'</b><div style="font-size:12px;color:#666">SKU: '+h.sku+' '+(b.rak||'')+'</div><div class="pct">'+h.persen+'% mirip</div><div class="alasan">'+h.alasan+'</div></div></div>'; }
-    document.getElementById('hasilAI').innerHTML=html;
-  }catch(err){ document.getElementById('statusAI').innerText='Gagal: '+err.message; }
+    let res=await Tesseract.recognize(el.files[0],'eng');
+    let teks=res.data.text.trim();
+    box.innerHTML='<b>Hasil baca foto (v3.5):</b><br>'+(teks||'(tidak ada teks terbaca)')+'<br><br><button onclick="pakaiHasilFoto()">Cari di database</button>';
+    window._teksFoto=teks;
+  }catch(e){ box.innerHTML='Gagal baca foto: '+e.message; }
 }
-bukaDB().then(loadSemua).then(function(){ render(); updateStat(); });
+function pakaiHasilFoto(){
+  let t=(window._teksFoto||'').split('\n')[0]||'';
+  let kata=t.split(' ').sort((a,b)=>b.length-a.length)[0]||t;
+  document.getElementById('searchInput').value=kata;
+  tampil();
+  document.getElementById('hasilFoto').innerHTML+='<br>🔍 Dicari: <b>'+kata+'</b>';
+}
+loadData();
 </script>
 </body>
 </html>
