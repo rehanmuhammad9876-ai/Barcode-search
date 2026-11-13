@@ -1,15 +1,21 @@
+
 {
-  "name": "Toko Cari Barang",
-  "short_name": "Cari Barang",
-  "start_url": "./index.html",
+  "id": "/",
+  "name": "SCANSTOCK",
+  "short_name": "SCANSTOCK",
+  "description": "Inventory Management System",
+  "start_url": "/",
+  "scope": "/",
   "display": "standalone",
-  "background_color": "#0b1e3a",
-  "theme_color": "#0b1e3a",
+  "orientation": "portrait",
+  "background_color": "#f5f3ef",
+  "theme_color": "#29231e",
   "icons": [
     {
-      "src": "https://via.placeholder.com/512/0b1e3a/ffffff?text=TB",
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='100' fill='%2329231e'/%3E%3Ctext x='50%25' y='55%25' text-anchor='middle' font-size='100' font-weight='bold' fill='white'%3ESS%3C/text%3E%3C/svg%3E",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
     }
   ]
 }
