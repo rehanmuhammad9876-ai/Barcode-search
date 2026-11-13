@@ -1,402 +1,853 @@
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
-<title>ScanStock - Toko</title>
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#111111">
-<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#29231e">
+<meta name="description" content="SCANSTOCK Inventory Management">
+<title>SCANSTOCK</title>
+<link rel="manifest" href="/manifest.json">
+
+<script src="https://unpkg.com/html5-qrcode"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+
 <style>
-*{box-sizing:border-box} body{margin:0;font-family:system-ui,Arial;background:#f3f3f3;color:#111}
-header{position:sticky;top:0;z-index:20;background:#111;color:#fff;padding:12px 14px;display:flex;justify-content:space-between;align-items:center}
-header b{font-size:18px;letter-spacing:1px} header button{background:#fff;color:#111;border:0;padding:8px 12px;border-radius:999px;font-weight:800}
-.search{padding:12px;display:flex;gap:8px;position:sticky;top:52px;z-index:19;background:#f3f3f3}
-.search input{flex:1;padding:12px;border:1px solid #ddd;border-radius:12px;font-size:15px}
-.search button{padding:12px 14px;border:0;border-radius:12px;font-weight:800}
-.btn-foto{background:#16a34a;color:#fff} .btn-scan{background:#7c3aed;color:#fff}
-.topinfo{padding:0 14px;font-size:12px;color:#666}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:12px}
-.card{background:#fff;border-radius:16px;overflow:hidden;cursor:pointer;border:1px solid #eee}
-.card img{width:100%;aspect-ratio:4/5;object-fit:cover;display:block;background:#eee}
-.card .p{padding:10px} .card .sku{font-size:11px;color:#888} .card .nama{font-weight:800;font-size:14px;line-height:1.2}
-.card .stok{font-size:12px;color:#666;margin-top:4px}
-/* DETAIL - kayak gambar lu */
-.detail{position:fixed;inset:0;background:#fff;z-index:50;overflow:auto;display:none}
-.detail .topbar{display:flex;justify-content:space-between;padding:12px}
-.detail .topbar button{border:0;background:#111;color:#fff;padding:10px 14px;border-radius:999px;font-weight:800}
-.foto-wrap{position:relative;background:#eee}
-.foto-wrap img{width:100%;aspect-ratio:4/5;object-fit:cover;display:block}
-.arrow{position:absolute;top:50%;transform:translateY(-50%);width:44px;height:44px;border-radius:50%;border:0;background:#8b5a2b;color:#fff;font-size:22px;font-weight:900;box-shadow:0 4px 12px rgba(0,0,0,.3)}
-.arrow.l{left:10px} .arrow.r{right:10px}
-.dots{display:flex;gap:6px;justify-content:center;padding:10px}
-.dots i{width:8px;height:8px;border-radius:50%;background:#ddd;display:block} .dots i.on{background:#111}
-.meta{display:flex;justify-content:space-between;padding:0 14px;font-size:12px;color:#666}
-.pdetail{padding:14px} .pdetail h2{font-size:28px;margin:4px 0} .pdetail .label{font-size:11px;letter-spacing:2px;color:#888;font-weight:800}
-.pdetail .desc{line-height:1.5;color:#333;white-space:pre-wrap}
-.row{display:flex;gap:8px;margin-top:12px} .row div{flex:1;background:#f7f7f7;padding:12px;border-radius:12px;text-align:center} .row b{font-size:18px}
-/* ADMIN */
-.admin{position:fixed;inset:0;background:#fff;z-index:60;overflow:auto;display:none;padding:16px}
-.admin input,.admin textarea,.admin select{width:100%;padding:12px;margin:6px 0;border:1px solid #ddd;border-radius:10px}
-.admin button{padding:12px;border:0;border-radius:10px;font-weight:800;margin:4px 0}
-.b-green{background:#16a34a;color:#fff} .b-dark{background:#111;color:#fff} .b-red{background:#ef4444;color:#fff} .b-grey{background:#eee}
-.foto-mini{display:flex;gap:8px;flex-wrap:wrap} .foto-mini img{width:80px;height:100px;object-fit:cover;border-radius:10px}
-.hidden{display:none!important}
+:root {
+  --dark:#29231e;
+  --brown:#765438;
+  --brown2:#a47c55;
+  --green:#239b57;
+  --purple:#7951c8;
+  --bg:#f5f3ef;
+  --white:#fff;
+  --muted:#89847e;
+  --border:#e6e1db;
+}
+
+* {box-sizing:border-box}
+body {
+  margin:0;
+  background:var(--bg);
+  color:var(--dark);
+  font-family:Arial,Helvetica,sans-serif;
+}
+button,input,textarea,select {font:inherit}
+button {cursor:pointer;border:0}
+header {
+  background:var(--dark);
+  color:white;
+  padding:17px 5%;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  position:sticky;
+  top:0;
+  z-index:10;
+}
+.logo {
+  font-size:28px;
+  font-weight:900;
+  letter-spacing:2px;
+}
+.menu-btn {
+  background:#504236;
+  color:white;
+  padding:12px 18px;
+  border-radius:10px;
+  font-weight:bold;
+}
+main {max-width:1150px;margin:auto;padding:20px}
+.search-area {
+  display:flex;
+  gap:8px;
+  margin-bottom:18px;
+}
+.search-area input {
+  flex:1;
+  min-width:0;
+  padding:17px;
+  border:1px solid var(--border);
+  border-radius:12px;
+  font-size:16px;
+}
+.action {
+  color:white;
+  padding:0 17px;
+  border-radius:10px;
+  font-weight:bold;
+}
+.green {background:var(--green)}
+.purple {background:var(--purple)}
+.brown {background:var(--brown)}
+.dark {background:var(--dark)}
+.panel {
+  background:white;
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:18px;
+  margin-bottom:18px;
+}
+.hero {
+  max-width:440px;
+  margin:0 auto;
+}
+.photo-frame {
+  width:100%;
+  aspect-ratio:4/5;
+  background:#e9e4dc;
+  border-radius:16px;
+  overflow:hidden;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.photo-frame img {
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+.no-photo {color:var(--muted);font-size:18px}
+.slider {
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:18px;
+  padding:14px 0;
+}
+.slider button {
+  background:var(--brown);
+  color:white;
+  border-radius:50%;
+  width:42px;
+  height:42px;
+  font-size:22px;
+}
+.dots {display:flex;gap:6px;align-items:center}
+.dot {
+  width:8px;height:8px;border-radius:50%;
+  background:#c9c0b6;
+}
+.dot.active {background:var(--brown);width:22px;border-radius:8px}
+.photo-caption {
+  display:flex;
+  justify-content:space-between;
+  color:var(--muted);
+  font-size:12px;
+}
+.detail {margin-top:20px}
+.sku {
+  font-size:clamp(36px,8vw,66px);
+  font-weight:900;
+  letter-spacing:1px;
+  overflow-wrap:anywhere;
+}
+.name {font-size:26px;font-weight:bold;margin:5px 0}
+.description {color:#716b65;margin:8px 0 20px}
+.detail-grid {
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:10px;
+}
+.detail-item {
+  padding:14px;
+  background:#f5f2ee;
+  border-radius:10px;
+}
+.detail-item small {display:block;color:var(--muted);margin-bottom:7px}
+.detail-item strong {font-size:19px}
+.section-title {
+  font-size:20px;
+  font-weight:800;
+  margin:24px 0 12px;
+}
+.grid {
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:12px;
+}
+.product-card {
+  background:white;
+  border:1px solid var(--border);
+  border-radius:13px;
+  padding:9px;
+  cursor:pointer;
+  min-width:0;
+}
+.product-card img {
+  width:100%;
+  aspect-ratio:4/5;
+  object-fit:cover;
+  border-radius:9px;
+  background:#eee9e2;
+}
+.product-card .sku-small {font-size:14px;font-weight:900;margin-top:8px}
+.product-card .name-small {
+  font-size:13px;margin:4px 0;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.product-card .stock-small {font-size:12px;color:var(--muted)}
+.admin-only {display:none}
+.admin .admin-only {display:inline-flex}
+.toolbar {display:flex;gap:8px;flex-wrap:wrap}
+.toolbar button {
+  color:white;padding:11px 14px;border-radius:9px;
+}
+input,textarea,select {
+  padding:12px;border:1px solid var(--border);
+  border-radius:9px;width:100%;margin:5px 0 12px;
+}
+label {font-size:13px;font-weight:bold}
+.modal {
+  position:fixed;inset:0;background:#0009;
+  z-index:30;display:none;overflow:auto;padding:20px;
+}
+.modal.show {display:flex;align-items:flex-start;justify-content:center}
+.modal-box {
+  background:white;border-radius:16px;
+  padding:22px;width:100%;max-width:520px;
+  margin:auto;
+}
+.modal-box h2 {margin-top:0}
+.close {
+  float:right;background:#eee;padding:8px 12px;border-radius:8px;
+}
+.primary {
+  width:100%;background:var(--brown);
+  color:white;padding:14px;border-radius:10px;
+  font-weight:bold;
+}
+.result {white-space:pre-wrap;font-size:13px;color:#655d55}
+.empty {padding:30px;text-align:center;color:var(--muted)}
+#reader {width:100%;max-width:400px;margin:auto}
+.hidden {display:none!important}
+@media(max-width:700px) {
+  main {padding:12px}
+  .logo {font-size:22px}
+  .grid {grid-template-columns:repeat(2,minmax(0,1fr))}
+  .search-area {flex-wrap:wrap}
+  .search-area input {flex-basis:100%}
+  .search-area button {height:43px;flex:1}
+}
 </style>
 </head>
+
 <body>
-<header><b>SCANSTOCK</b><button onclick="openAdmin()">☰ MENU</button></header>
+<header>
+  <div class="logo">SCANSTOCK</div>
+  <button class="menu-btn" onclick="openMenu()">☰ MENU</button>
+</header>
 
-<div class="search">
-<input id="q" placeholder="Cari SKU / Nama / Deskripsi... misal 9034926 / PILLOW / bantal ayam" oninput="render()">
-<button class="btn-foto" onclick="document.getElementById('fotoInput').click()">🖼️ FOTO</button>
-<button class="btn-scan" onclick="alert('Scan Barcode: arahkan kamera ke barcode')">📷 SCAN</button>
-<input type="file" id="fotoInput" accept="image/*" class="hidden">
+<main>
+  <div class="search-area">
+    <input id="search" placeholder="Cari SKU / Nama / Deskripsi"
+      oninput="searchProducts()">
+    <button class="action green" onclick="document.getElementById('photoInput').click()">FOTO</button>
+    <button class="action purple" onclick="openScanner()">SCAN</button>
+  </div>
+
+  <input id="photoInput" type="file" accept="image/*"
+    class="hidden" onchange="searchByPhoto(event)">
+
+  <section class="panel hero" id="hero">
+    <div class="photo-frame" id="photoFrame">
+      <div class="no-photo">Belum ada foto barang</div>
+    </div>
+    <div class="slider">
+      <button onclick="gantiFoto(-1)">←</button>
+      <div class="dots" id="dots"></div>
+      <button onclick="gantiFoto(1)">→</button>
+    </div>
+    <div class="photo-caption">
+      <span id="photoCount">0 design foto</span>
+      <span>Embedding siap dicari</span>
+    </div>
+
+    <div class="detail" id="detail">
+      <div class="empty">Pilih barang untuk melihat detail.</div>
+    </div>
+  </section>
+
+  <div class="section-title" id="listTitle">Daftar Barang</div>
+  <div class="grid" id="productGrid"></div>
+
+  <div class="empty hidden" id="empty">Barang tidak ditemukan.</div>
+
+  <section class="panel admin-only">
+    <h3>ADMINISTRATOR</h3>
+    <div class="toolbar">
+      <button class="brown" onclick="editProduct()">+ Tambah Barang</button>
+      <button class="dark" onclick="importExcel()">Upload Excel / CSV</button>
+      <button class="brown" onclick="document.getElementById('backupInput').click()">Restore Backup</button>
+      <button class="green" onclick="backupNow()">Backup Sekarang</button>
+    </div>
+    <input type="file" id="excelInput" accept=".xlsx,.xls,.csv"
+      class="hidden" onchange="processExcel(event)">
+    <input type="file" id="backupInput" accept=".json"
+      class="hidden" onchange="restoreBackup(event)">
+    <div id="importReport" class="result"></div>
+  </section>
+</main>
+
+<!-- MENU -->
+<div class="modal" id="menuModal">
+  <div class="modal-box">
+    <button class="close" onclick="closeModal('menuModal')">TUTUP</button>
+    <h2>MENU SCANSTOCK</h2>
+    <button class="primary" onclick="loginAdmin()">Login Admin</button>
+    <br><br>
+    <div class="admin-only">
+      <button class="primary" onclick="logoutAdmin()">Logout Admin</button>
+    </div>
+    <br>
+    <button class="primary" onclick="offlineSearchMode()">Cari Foto Offline</button>
+    <br><br>
+    <button class="primary" onclick="geminiSearchMode()">Cari Foto Gemini</button>
+  </div>
 </div>
-<div class="topinfo" id="topinfo">Memuat data.xlsx dari GitHub...</div>
-<div class="grid" id="grid"></div>
 
-<!-- DETAIL -->
-<div class="detail" id="detail">
-  <div class="topbar"><button onclick="closeDetail()">← Kembali</button><button onclick="editCurrent()">✏️ Edit (Admin)</button></div>
-  <div class="foto-wrap">
-    <img id="dFoto" src="">
-    <button class="arrow l" onclick="geserFoto(-1)">←</button>
-    <button class="arrow r" onclick="geserFoto(1)">→</button>
-  </div>
-  <div class="dots" id="dots"></div>
-  <div class="meta"><span id="dCount">0 foto</span><span id="dEmbed">Embedding siap dicari</span></div>
-  <div class="pdetail">
-    <div class="label">PRODUCT DETAIL</div>
-    <h2 id="dSku">-</h2>
-    <div id="dNama" style="font-size:18px;font-weight:700"></div>
-    <div class="desc" id="dDesc" style="margin-top:10px"></div>
-    <div class="row"><div><span style="font-size:11px;color:#888">STOK</span><br><b id="dStok">0</b></div><div><span style="font-size:11px;color:#888">HARGA</span><br><b id="dHarga">0</b></div><div><span style="font-size:11px;color:#888">LOKASI</span><br><b id="dLokasi">-</b></div></div>
+<!-- EDIT -->
+<div class="modal" id="editModal">
+  <div class="modal-box">
+    <button class="close" onclick="closeModal('editModal')">TUTUP</button>
+    <h2 id="editTitle">Tambah Barang</h2>
+    <form id="editForm" onsubmit="saveProduct(event)">
+      <input type="hidden" id="editId">
+      <label>SKU</label><input id="fSku" required>
+      <label>Nama</label><input id="fNama" required>
+      <label>Deskripsi</label><textarea id="fDesc"></textarea>
+      <label>Stok</label><input id="fStok" type="number">
+      <label>Harga</label><input id="fHarga" type="number">
+      <label>Lokasi Rak</label><input id="fLokasi">
+      <button class="primary" type="submit">SIMPAN BARANG</button>
+    </form>
+    <hr>
+    <div class="admin-only">
+      <label>Tambah Foto (maksimal 10 per SKU)</label>
+      <input id="multiPhotos" type="file" accept="image/*" multiple>
+      <button class="primary" onclick="uploadPhotos()">+ TAMBAH FOTO</button>
+      <div id="photoAdminList"></div>
+    </div>
   </div>
 </div>
 
-<!-- ADMIN -->
-<div class="admin" id="admin">
-  <div style="display:flex;justify-content:space-between;align-items:center"><h2>Menu Admin</h2><button class="b-dark" onclick="closeAdmin()">X Tutup</button></div>
-  <div id="loginBox">
-    <p>Masukin PIN Admin. Kasir tidak bisa edit.</p>
-    <input type="password" id="pinInput" placeholder="PIN Admin (default 123456)">
-    <button class="b-dark" style="width:100%" onclick="loginAdmin()">Masuk Admin</button>
-  </div>
-  <div id="adminBox" class="hidden">
-    <h3>➕ Tambah / Edit Barang</h3>
-    <input id="fSku" placeholder="SKU * contoh 9034926">
-    <input id="fNama" placeholder="Nama * contoh PILLOW">
-    <textarea id="fDesc" placeholder="Deskripsi - contoh Bantal ayam kuning, 5 design, bahan katun"></textarea>
-    <input id="fHarga" type="number" placeholder="Harga">
-    <input id="fStok" type="number" placeholder="Stok">
-    <input id="fLokasi" placeholder="Lokasi Rak - contoh Rak A2">
-    <button class="b-green" style="width:100%" onclick="saveBarang()">💾 Simpan Barang</button>
-    <h3>🖼️ Upload Foto Massal - Tanpa Rename</h3>
-<p style="font-size:12px;color:#666">Caranya: 1. Ketik SKU dulu, 2. Pilih banyak foto, 3. Klik TEMPEL. Foto langsung nempel jadi slider.</p>
-
-<input id="fSkuFoto" placeholder="Ketik SKU-nya dulu - contoh 9034926" style="border:2px solid #111;font-weight:800;font-size:16px">
-<input type="file" id="fFotoMassal" accept="image/*" multiple>
-<div id="previewMassal" style="display:flex;gap:8px;flex-wrap:wrap;margin:8px 0"></div>
-<button class="b-green" style="width:100%;font-size:16px;padding:14px" onclick="tempelFotoKeSku()">📸 TEMPEL SEMUA FOTO KE SKU INI</button>
-<div id="statusMassal" style="font-size:12px;margin-top:6px"></div>
-
-<div class="foto-mini" id="fotoList"></div>
-<button class="b-grey" onclick="renderFotoList()">🔄 Lihat Foto Yang Sudah Nempel</button>
-    <div class="foto-mini" id="fotoList"></div>
-    <h3>📥 Upload Excel / CSV</h3>
-    <p style="font-size:12px;color:#666">Kalau SKU sudah ada, otomatis di-skip. Ga akan double.</p>
-    <input type="file" id="excelInput" accept=".xlsx,.xls,.csv">
-    <button class="b-dark" style="width:100%" onclick="uploadExcel()">Upload Excel / CSV</button>
-    <div id="uploadStatus" style="font-size:12px;margin-top:6px"></div>
-    <h3>💾 Backup / Restore</h3>
-    <button class="b-green" onclick="backupData()">⬇️ Backup Barang + Foto</button>
-    <button class="b-grey" onclick="document.getElementById('restoreInput').click()">⬆️ Restore Backup</button>
-    <input type="file" id="restoreInput" accept=".json" class="hidden">
-    <p style="font-size:12px;color:#666">Backup ini simpen di GitHub juga sebagai <b>backup.json</b> biar permanen. Caranya: abis download, upload file backup.json itu ke repo GitHub lu kayak upload data.xlsx kemarin.</p>
-    <button class="b-red" style="width:100%" onclick="logoutAdmin()">Keluar Admin</button>
+<!-- SCANNER -->
+<div class="modal" id="scanModal">
+  <div class="modal-box">
+    <button class="close" onclick="stopScanner()">TUTUP</button>
+    <h2>SCAN BARCODE</h2>
+    <div id="reader"></div>
   </div>
 </div>
 
 <script>
-let DB = []; // dari data.xlsx
-let FOTO_DB = {}; // sku -> [dataURL,...] disimpen di IndexedDB biar permanen di HP + bisa di-backup
-let cur = null, curFotoIdx = 0, isAdmin = false;
-const ADMIN_PIN = "123456";
-const DB_NAME = 'scanstock_github_v4';
+// ================= CONFIG =================
+const API = '';
+let GEMINI_API_KEY = 'ISI_API_KEY_DI_SINI';
+let GEMINI_MODEL = 'gemini-3.5-flash-lite';
 
-// --- LOAD data.xlsx DARI GITHUB (repo yang sama) ---
-async function loadExcel(){
-  try{
-    const res = await fetch('data.xlsx');
-    if(!res.ok) throw new Error('data.xlsx ga ketemu');
-    const buf = await res.arrayBuffer();
-    const wb = XLSX.read(buf, {type:'array'});
-    const rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);
-    // ANTI DOUBLE SKU
-    let map = new Map(), skip=0;
-    rows.forEach(r=>{
-      let sku = String(r.SKU || r.sku || r.Kode || r['Kode Barang'] || r['KODE'] || '').trim();
-      let nama = r.Nama || r.nama || r['Nama Barang'] || r.NAMA || '';
-      if(!sku || !nama) return;
-      if(map.has(sku)){ skip++; return; } // skip double
-      map.set(sku, {
-        sku, nama,
-        deskripsi: r.Deskripsi || r.deskripsi || r.DESKRIPSI || r['Deskripsi Barang'] || '',
-        harga: r.Harga || r.harga || r.HARGA || 0,
-        stok: r.Stok || r.stok || r.STOK || r.Qty || 0,
-        lokasi: r.Lokasi || r.lokasi || r.Rak || ''
-      });
-    });
-    DB = [...map.values()];
-    document.getElementById('topinfo').innerText = `✅ Data ke-load: ${DB.length} barang | SKU kembar dibuang: ${skip} | Dari GitHub`;
-    render();
-  }catch(e){
-    document.getElementById('topinfo').innerText = '⚠️ data.xlsx belum ketemu di GitHub. Upload data.xlsx dulu kayak kemarin.';
+let adminPIN = sessionStorage.getItem('scanstock_admin') || '';
+let products = [];
+let currentProduct = null;
+let fotoList = [];
+let indexFoto = 0;
+let scanner = null;
+let editingProductId = null;
+
+function headers(extra={}) {
+  return {...extra, 'x-admin-pin':adminPIN};
+}
+function money(n) {
+  return 'Rp ' + Number(n||0).toLocaleString('id-ID');
+}
+function photoUrl(url) {
+  return url || '';
+}
+function escapeHTML(s) {
+  return String(s ?? '').replace(/[&<>"']/g,c=>({
+    '&':'&amp;','<':'&lt;','>':'&gt;',
+    '"':'&quot;',"'":'&#39;'
+  })[c]);
+}
+function openModal(id) {
+  document.getElementById(id).classList.add('show');
+}
+function closeModal(id) {
+  document.getElementById(id).classList.remove('show');
+}
+function openMenu() {openModal('menuModal')}
+
+// ================= LOAD =================
+async function loadProducts(q='') {
+  try {
+    const r=await fetch(API+'/api/products?q='+encodeURIComponent(q));
+    if(!r.ok) throw new Error('Gagal memuat data');
+    const j=await r.json();
+    products=j.data||[];
+    renderGrid(products);
+  } catch(e) {
+    console.error(e);
+    document.getElementById('productGrid').innerHTML=
+      '<div class="empty">Server belum terhubung.</div>';
   }
-  loadFotoDB();
 }
 
-// --- FOTO: IndexedDB ---
-function loadFotoDB(){
-  let req = indexedDB.open(DB_NAME,1);
-  req.onupgradeneeded = e=>{ e.target.result.createObjectStore('foto'); };
-  req.onsuccess = e=>{
-    let db=e.target.result;
-    let tx=db.transaction('foto','readonly'); let st=tx.objectStore('foto');
-    let r=st.get('all'); r.onsuccess=()=>{ FOTO_DB = r.result || {}; render(); };
+function renderGrid(list) {
+  const grid=document.getElementById('productGrid');
+  document.getElementById('empty').classList.toggle('hidden',list.length>0);
+  grid.innerHTML=list.map(p=>`
+    <div class="product-card" onclick="showDetail(${p.id})">
+      ${p.foto?.[0]?.url
+        ? `<img src="${escapeHTML(p.foto[0].url)}" loading="lazy">`
+        : '<div class="photo-frame"></div>'}
+      <div class="sku-small">${escapeHTML(p.sku)}</div>
+      <div class="name-small">${escapeHTML(p.nama)}</div>
+      <div class="stock-small">Stok: ${p.stok}</div>
+    </div>
+  `).join('');
+}
+
+let searchTimer;
+function searchProducts() {
+  clearTimeout(searchTimer);
+  searchTimer=setTimeout(()=>
+    loadProducts(document.getElementById('search').value),180);
+}
+
+// ================= DETAIL =================
+async function showDetail(id) {
+  try {
+    const r=await fetch(API+'/api/products/'+id);
+    if(!r.ok) throw new Error('Barang tidak ditemukan');
+    currentProduct=await r.json();
+    fotoList=currentProduct.foto||[];
+    indexFoto=0;
+    renderDetail();
+    window.scrollTo({top:0,behavior:'smooth'});
+  } catch(e) {alert(e.message)}
+}
+
+function renderDetail() {
+  if(!currentProduct)return;
+  const p=currentProduct;
+  const frame=document.getElementById('photoFrame');
+
+  frame.innerHTML=fotoList.length
+    ? `<img id="fotoUtama" src="${escapeHTML(fotoList[indexFoto].url)}">`
+    : '<div class="no-photo">Foto belum tersedia</div>';
+
+  document.getElementById('photoCount').textContent=
+    fotoList.length+' design foto';
+
+  document.getElementById('dots').innerHTML=
+    fotoList.map((_,i)=>`<span class="dot ${i===indexFoto?'active':''}"></span>`).join('');
+
+  document.getElementById('detail').innerHTML=`
+    <div class="sku">${escapeHTML(p.sku)}</div>
+    <div class="name">${escapeHTML(p.nama)}</div>
+    <div class="description">${escapeHTML(p.deskripsi)}</div>
+    <div class="detail-grid">
+      <div class="detail-item"><small>STOK</small><strong>${p.stok}</strong></div>
+      <div class="detail-item"><small>HARGA</small><strong>${money(p.harga)}</strong></div>
+      <div class="detail-item" style="grid-column:span 2">
+        <small>LOKASI RAK</small><strong>${escapeHTML(p.lokasi)}</strong>
+      </div>
+    </div>
+    <div class="toolbar admin-only" style="margin-top:15px">
+      <button class="brown" onclick="editProduct(${p.id})">EDIT</button>
+      <button class="dark" onclick="deleteProduct(${p.id})">HAPUS</button>
+    </div>
+  `;
+
+  document.body.classList.toggle('admin',!!adminPIN);
+}
+
+function gantiFoto(arah) {
+  if(!fotoList.length)return;
+  indexFoto=(indexFoto+arah+fotoList.length)%fotoList.length;
+  renderDetail();
+}
+
+// ================= ADMIN =================
+async function loginAdmin() {
+  const pin=prompt('Masukkan PIN Admin');
+  if(pin===null)return;
+  try {
+    const r=await fetch('/api/login',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({pin})
+    });
+    if(!r.ok)throw new Error('PIN salah');
+    adminPIN=pin;
+    sessionStorage.setItem('scanstock_admin',pin);
+    document.body.classList.add('admin');
+    closeModal('menuModal');
+    if(currentProduct)renderDetail();
+    alert('Login admin berhasil');
+  } catch(e) {alert(e.message)}
+}
+
+function logoutAdmin() {
+  adminPIN='';
+  sessionStorage.removeItem('scanstock_admin');
+  document.body.classList.remove('admin');
+  closeModal('menuModal');
+  if(currentProduct)renderDetail();
+  alert('Logout berhasil');
+}
+
+function editProduct(id=null) {
+  if(!adminPIN)return alert('Login admin terlebih dahulu');
+  editingProductId=id;
+  const p=id?products.find(x=>x.id===id)||currentProduct:null;
+  document.getElementById('editTitle').textContent=
+    p?'Edit Barang':'Tambah Barang';
+  document.getElementById('editId').value=id||'';
+  document.getElementById('fSku').value=p?.sku||'';
+  document.getElementById('fNama').value=p?.nama||'';
+  document.getElementById('fDesc').value=p?.deskripsi||'';
+  document.getElementById('fStok').value=p?.stok??0;
+  document.getElementById('fHarga').value=p?.harga??0;
+  document.getElementById('fLokasi').value=p?.lokasi||'';
+  document.getElementById('multiPhotos').value='';
+  document.getElementById('photoAdminList').innerHTML='';
+  openModal('editModal');
+}
+
+async function saveProduct(e) {
+  e.preventDefault();
+  const id=editingProductId;
+  const data={
+    sku:fSku.value.trim(),
+    nama:fNama.value.trim(),
+    deskripsi:fDesc.value,
+    stok:Number(fStok.value),
+    harga:Number(fHarga.value),
+    lokasi:fLokasi.value
+  };
+  try {
+    const r=await fetch('/api/products'+(id?'/'+id:''),{
+      method:id?'PUT':'POST',
+      headers:headers({'Content-Type':'application/json'}),
+      body:JSON.stringify(data)
+    });
+    const j=await r.json();
+    if(!r.ok)throw new Error(j.error);
+    closeModal('editModal');
+    await loadProducts();
+    await showDetail(j.id||id);
+    alert('Barang berhasil disimpan');
+  } catch(e){alert(e.message)}
+}
+
+async function deleteProduct(id) {
+  if(!adminPIN)return alert('Admin wajib login');
+  if(!confirm('Yakin hapus barang ini?'))return;
+  try {
+    const r=await fetch('/api/products/'+id,{
+      method:'DELETE',headers:headers()
+    });
+    const j=await r.json();
+    if(!r.ok)throw new Error(j.error);
+    currentProduct=null;
+    document.getElementById('detail').innerHTML='<div class="empty">Pilih barang.</div>';
+    await loadProducts();
+  } catch(e){alert(e.message)}
+}
+
+// ================= IMAGE RESIZE =================
+async function resizeImage(file) {
+  const img=new Image();
+  const url=URL.createObjectURL(file);
+  img.src=url;
+  await new Promise((resolve,reject)=>{
+    img.onload=resolve;
+    img.onerror=reject;
+  });
+
+  const scale=Math.min(1,1000/Math.max(img.width,img.height));
+  const canvas=document.createElement('canvas');
+  canvas.width=Math.round(img.width*scale);
+  canvas.height=Math.round(img.height*scale);
+  canvas.getContext('2d').drawImage(img,0,0,canvas.width,canvas.height);
+  URL.revokeObjectURL(url);
+
+  return new Promise(resolve=>
+    canvas.toBlob(resolve,'image/jpeg',0.85)
+  );
+}
+
+async function uploadPhotos() {
+  if(!editingProductId)return alert('Simpan barang terlebih dahulu');
+  const files=[...multiPhotos.files];
+  if(!files.length)return alert('Pilih foto');
+  try {
+    const form=new FormData();
+    for(const file of files) {
+      form.append('photos',await resizeImage(file),
+        file.name.replace(/\.[^.]+$/,'')+'.jpg');
+    }
+    const r=await fetch('/api/products/'+editingProductId+'/photos',{
+      method:'POST',headers:headers(),body:form
+    });
+    const j=await r.json();
+    if(!r.ok)throw new Error(j.error);
+    alert('Foto berhasil ditambahkan');
+    closeModal('editModal');
+    await loadProducts();
+    await showDetail(editingProductId);
+  } catch(e){alert(e.message)}
+}
+
+// ================= EXCEL =================
+function importExcel() {
+  if(!adminPIN)return alert('Login admin terlebih dahulu');
+  document.getElementById('excelInput').click();
+}
+
+async function processExcel(e) {
+  const file=e.target.files[0];
+  if(!file)return;
+  try {
+    const form=new FormData();
+    form.append('file',file);
+    const r=await fetch('/api/import',{
+      method:'POST',headers:headers(),body:form
+    });
+    const j=await r.json();
+    if(!r.ok)throw new Error(j.error);
+    document.getElementById('importReport').textContent=
+      j.message+'\nDaftar SKU double: '+JSON.stringify(j.skippedSKUs);
+    await loadProducts();
+    alert(j.message);
+  } catch(err){alert(err.message)}
+  e.target.value='';
+}
+
+// ================= BACKUP =================
+async function backupNow() {
+  if(!adminPIN)return alert('Login admin terlebih dahulu');
+  try {
+    const r=await fetch('/api/backup',{headers:headers()});
+    if(!r.ok)throw new Error('Backup gagal');
+    const blob=await r.blob();
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(blob);
+    a.download='scanstock-backup.json';
+    a.click();
+    URL.revokeObjectURL(a.href);
+  } catch(e){alert(e.message)}
+}
+
+async function restoreBackup(e) {
+  const file=e.target.files[0];
+  if(!file)return;
+  if(!confirm('PERINGATAN: Data database sekarang akan diganti. Lanjutkan?'))return;
+  try {
+    const backup=JSON.parse(await file.text());
+    const r=await fetch('/api/restore',{
+      method:'POST',
+      headers:headers({'Content-Type':'application/json'}),
+      body:JSON.stringify(backup)
+    });
+    const j=await r.json();
+    if(!r.ok)throw new Error(j.error);
+    alert(j.message);
+    await loadProducts();
+  } catch(err){alert(err.message)}
+  e.target.value='';
+}
+
+// ================= BARCODE =================
+async function openScanner() {
+  openModal('scanModal');
+  scanner=new Html5Qrcode('reader');
+  try {
+    await scanner.start(
+      {facingMode:'environment'},
+      {fps:10,qrbox:{width:250,height:150}},
+      async decodedText=>{
+        await stopScanner();
+        document.getElementById('search').value=decodedText;
+        await loadProducts(decodedText);
+        const found=products.find(p=>p.sku.toLowerCase()===decodedText.toLowerCase());
+        if(found)showDetail(found.id);
+        else alert('SKU tidak ditemukan: '+decodedText);
+      },
+      ()=>{}
+    );
+  } catch(e){alert('Kamera tidak dapat dibuka: '+e)}
+}
+
+async function stopScanner() {
+  if(scanner) {
+    try {
+      if(scanner.isScanning)await scanner.stop();
+      await scanner.clear();
+    } catch(e){}
+    scanner=null;
+  }
+  closeModal('scanModal');
+}
+
+// ================= IMAGE SEARCH OFFLINE =================
+function getImageFeatures(source) {
+  const canvas=document.createElement('canvas');
+  canvas.width=32;canvas.height=32;
+  const ctx=canvas.getContext('2d',{willReadFrequently:true});
+  ctx.drawImage(source,0,0,32,32);
+  const data=ctx.getImageData(0,0,32,32).data;
+
+  const hist=new Array(12).fill(0);
+  let edges=0,texture=0,grayPrev=0;
+
+  for(let i=0;i<1024;i++) {
+    const r=data[i*4],g=data[i*4+1],b=data[i*4+2];
+    hist[Math.floor(r/64)]++;
+    hist[4+Math.floor(g/64)]++;
+    hist[8+Math.floor(b/64)]++;
+
+    const gray=(r+g+b)/3;
+    if(i%32!==0) {
+      edges+=Math.abs(gray-grayPrev);
+      texture+=Math.abs(gray-grayPrev);
+    }
+    grayPrev=gray;
+  }
+  return {
+    hist:hist.map(x=>x/3072),
+    edge:edges/1024,
+    texture:texture/1024,
+    data
   };
 }
-function saveFotoDB(){
-  let req=indexedDB.open(DB_NAME,1);
-  req.onsuccess=e=>{ let db=e.target.result; let tx=db.transaction('foto','readwrite'); tx.objectStore('foto').put(FOTO_DB,'all'); };
+
+function featureSimilarity(a,b) {
+  let color=0;
+  for(let i=0;i<12;i++)color+=Math.abs(a.hist[i]-b.hist[i]);
+  color=Math.max(0,1-color/2);
+
+  const shape=Math.max(0,1-Math.abs(a.edge-b.edge)/100);
+  const texture=Math.max(0,1-Math.abs(a.texture-b.texture)/100);
+
+  return Math.round((color*40+shape*40+texture*20));
 }
 
-// --- RENDER LIST ---
-function render(){
-  let q = document.getElementById('q').value.toLowerCase();
-  let list = DB.filter(b => !q || b.sku.toLowerCase().includes(q) || b.nama.toLowerCase().includes(q) || (b.deskripsi||'').toLowerCase().includes(q));
-  document.getElementById('grid').innerHTML = list.slice(0,100).map(b=>{
-    let fotos = FOTO_DB[b.sku] || [];
-    let img = fotos[0] || 'https://via.placeholder.com/400x500?text=No+Foto';
-    return `<div class="card" onclick="openDetail('${b.sku}')"><img src="${img}"><div class="p"><div class="sku">SKU ${b.sku} • ${fotos.length} foto</div><div class="nama">${b.nama}</div><div class="stok">Stok: ${b.stok} • ${b.lokasi||''}</div></div></div>`;
-  }).join('') || '<p style="padding:14px">Barang ga ketemu. Coba kata lain.</p>';
-}
-
-// --- DETAIL + SLIDER ---
-function openDetail(sku){
-  cur = DB.find(b=>b.sku==sku); if(!cur) return;
-  curFotoIdx=0; updateDetail();
-  document.getElementById('detail').style.display='block';
-}
-function updateDetail(){
-  let fotos = FOTO_DB[cur.sku] || [];
-  document.getElementById('dFoto').src = fotos[curFotoIdx] || 'https://via.placeholder.com/400x500?text=No+Foto';
-  document.getElementById('dSku').innerText = cur.sku;
-  document.getElementById('dNama').innerText = cur.nama;
-  document.getElementById('dDesc').innerText = cur.deskripsi || '-';
-  document.getElementById('dStok').innerText = cur.stok;
-  document.getElementById('dHarga').innerText = cur.harga;
-  document.getElementById('dLokasi').innerText = cur.lokasi || '-';
-  document.getElementById('dCount').innerText = `${fotos.length} foto • Foto ${fotos.length?curFotoIdx+1:0} dari ${fotos.length}`;
-  document.getElementById('dots').innerHTML = fotos.map((_,i)=>`<i class="${i===curFotoIdx?'on':''}"></i>`).join('');
-}
-function geserFoto(d){
-  let fotos = FOTO_DB[cur.sku] || []; if(!fotos.length) return;
-  curFotoIdx = (curFotoIdx + d + fotos.length) % fotos.length;
-  updateDetail();
-}
-function closeDetail(){ document.getElementById('detail').style.display='none'; }
-
-// --- CARI BY FOTO: VISUAL SEARCH (BUKAN OCR) - dari HTML lu dulu ---
-function getImageFeatures(dataUrl, cb){
-  let img=new Image();
-  img.onload=()=>{
-    let S=32; let c=document.createElement('canvas'); c.width=S; c.height=S;
-    let ctx=c.getContext('2d'); ctx.drawImage(img,0,0,S,S);
-    let d=ctx.getImageData(0,0,S,S).data;
-    let colorHist=new Array(512).fill(0), edgeOrient=new Array(8).fill(0), gridEdge=new Array(16).fill(0), gridColor=new Array(48).fill(0), centerHist=new Array(64).fill(0);
-    let gray=new Float32Array(S*S);
-    for(let y=0;y<S;y++) for(let x=0;x<S;x++){
-      let i=(y*S+x)*4; let r=d[i],g=d[i+1],b=d[i+2];
-      let ri=Math.min(7,Math.floor(r/32)), gi=Math.min(7,Math.floor(g/32)), bi=Math.min(7,Math.floor(b/32));
-      colorHist[ri*64+gi*8+bi]++; gray[y*S+x]=(r+g+b)/3;
-      let gx=Math.min(3,Math.floor(x/8)), gy=Math.min(3,Math.floor(y/8)); let gi2=(gy*4+gx)*3; gridColor[gi2]+=r; gridColor[gi2+1]+=g; gridColor[gi2+2]+=b;
-      if(x>=8&&x<24&&y>=8&&y<24){ let cri=Math.min(3,Math.floor(r/64)),cgi=Math.min(3,Math.floor(g/64)),cbi=Math.min(3,Math.floor(b/64)); centerHist[cri*16+cgi*4+cbi]++; }
-    }
-    for(let i=0;i<512;i++) colorHist[i]/=(S*S);
-    for(let i=0;i<64;i++) centerHist[i]/=256;
-    for(let i=0;i<48;i++) gridColor[i]/=(64*255);
-    for(let y=1;y<S-1;y++) for(let x=1;x<S-1;x++){
-      let gx=-gray[(y-1)*S+x-1]-2*gray[y*S+x-1]-gray[(y+1)*S+x-1]+gray[(y-1)*S+x+1]+2*gray[y*S+x+1]+gray[(y+1)*S+x+1];
-      let gy=-gray[(y-1)*S+x-1]-2*gray[(y-1)*S+x]-gray[(y-1)*S+x+1]+gray[(y+1)*S+x-1]+2*gray[(y+1)*S+x]+gray[(y+1)*S+x+1];
-      let mag=Math.sqrt(gx*gx+gy*gy);
-      if(mag>30){ let ang=Math.atan2(gy,gx); let bin=Math.floor((ang+Math.PI)/(Math.PI*2)*8)%8; edgeOrient[bin]+=mag; let gx2=Math.min(3,Math.floor(x/8)), gy2=Math.min(3,Math.floor(y/8)); gridEdge[gy2*4+gx2]+=mag; }
-    }
-    let sE=edgeOrient.reduce((a,b)=>a+b,0)||1; for(let i=0;i<8;i++) edgeOrient[i]/=sE;
-    let sG=gridEdge.reduce((a,b)=>a+b,0)||1; for(let i=0;i<16;i++) gridEdge[i]/=sG;
-    cb({color:colorHist,edge:edgeOrient,grid:gridEdge,gridColor:gridColor,center:centerHist});
-  }; img.src=dataUrl;
-}
-function featureSimilarity(f1,f2){
-  function dist(a,b){let s=0; for(let i=0;i<a.length;i++){let d=a[i]-b[i]; s+=d*d;} return Math.sqrt(s);}
-  let cs=Math.max(0,1-dist(f1.color,f2.color)/0.35);
-  let ce=Math.max(0,1-dist(f1.center,f2.center)/0.5);
-  let es=Math.max(0,1-dist(f1.edge,f2.edge)/0.6);
-  let gs=Math.max(0,1-dist(f1.grid,f2.grid)/0.7);
-  let gcs=Math.max(0,1-dist(f1.gridColor,f2.gridColor)/1.5);
-  return Math.round((cs*0.25+ce*0.30+es*0.20+gs*0.10+gcs*0.15)*100); // Warna 40 + Bentuk 40 + Tekstur 20 versi fix
-}
-document.getElementById('fotoInput').addEventListener('change', e=>{
-  let f=e.target.files[0]; if(!f) return;
-  let r=new FileReader(); r.onload=ev=>{
-    getImageFeatures(ev.target.result, hashCari=>{
-      let scored=[];
-      let allSkus = Object.keys(FOTO_DB);
-      let done=0;
-      if(!allSkus.length){ alert('Belum ada foto barang yang disimpen. Masukin foto dulu di Admin.'); return; }
-      allSkus.forEach(sku=>{
-        let fotoUtama = FOTO_DB[sku][0];
-        getImageFeatures(fotoUtama, h2=>{
-          let skor = featureSimilarity(hashCari,h2);
-          let barang = DB.find(b=>b.sku==sku);
-          if(barang) scored.push({barang, skor});
-          done++; if(done===allSkus.length){
-            scored.sort((a,b)=>b.skor-a.skor);
-            let top = scored.slice(0,8);
-            let teks = top.map(t=>`${t.barang.nama} (${t.barang.sku}) - ${t.skor}%`).join('\n');
-            if(confirm('Paling mirip:\n'+teks+'\n\nBuka yang paling mirip?')) openDetail(top[0].barang.sku);
-          }
-        });
-      });
-    });
-  }; r.readAsDataURL(f);
-});
-
-// --- ADMIN ---
-function openAdmin(){ document.getElementById('admin').style.display='block'; }
-function closeAdmin(){ document.getElementById('admin').style.display='none'; }
-function loginAdmin(){
-  if(document.getElementById('pinInput').value === ADMIN_PIN){
-    isAdmin=true; document.getElementById('loginBox').classList.add('hidden'); document.getElementById('adminBox').classList.remove('hidden');
-  } else alert('PIN salah!');
-}
-function logoutAdmin(){ isAdmin=false; document.getElementById('loginBox').classList.remove('hidden'); document.getElementById('adminBox').classList.add('hidden'); closeAdmin(); }
-function editCurrent(){
-  if(!isAdmin){ alert('Hanya Admin yang bisa edit. Klik Menu -> masukin PIN.'); openAdmin(); return; }
-  document.getElementById('fSku').value=cur.sku; document.getElementById('fNama').value=cur.nama; document.getElementById('fDesc').value=cur.deskripsi; document.getElementById('fHarga').value=cur.harga; document.getElementById('fStok').value=cur.stok; document.getElementById('fLokasi').value=cur.lokasi;
-  closeDetail(); openAdmin(); renderFotoList();
-}
-function saveBarang(){
-  if(!isAdmin) return alert('Hanya Admin!');
-  let sku=document.getElementById('fSku').value.trim();
-  if(!sku) return alert('SKU wajib!');
-  if(DB.some(b=>b.sku==sku && cur && b.sku!=cur.sku)) return alert('SKU '+sku+' sudah ada! Ga boleh double.');
-  let data={sku, nama:document.getElementById('fNama').value, deskripsi:document.getElementById('fDesc').value, harga:document.getElementById('fHarga').value, stok:document.getElementById('fStok').value, lokasi:document.getElementById('fLokasi').value};
-  let idx=DB.findIndex(b=>b.sku==sku);
-  if(idx>=0) DB[idx]=data; else DB.push(data);
-  alert('Disimpen! Jangan lupa Backup + upload backup.json ke GitHub biar permanen.');
-  render();
-}
-function renderFotoList(){
-  let sku=document.getElementById('fSku').value; if(!sku) return;
-  let fotos=FOTO_DB[sku]||[];
-  document.getElementById('fotoList').innerHTML=fotos.map((f,i)=>`<div><img src="${f}"><br><button onclick="hapusFoto('${sku}',${i})">Hapus</button></div>`).join('')||'Belum ada foto';
-}
-// PART 3 FIX: Upload Massal Tanpa Rename - Ketik SKU, Langsung Nempel
-let fotoMassalTerpilih = [];
-
-// Preview pas pilih foto
-document.getElementById('fFotoMassal').addEventListener('change', e=>{
-  fotoMassalTerpilih = [...e.target.files];
-  let preview = document.getElementById('previewMassal');
-  preview.innerHTML = '';
-  fotoMassalTerpilih.forEach(f=>{
-    let url = URL.createObjectURL(f);
-    preview.innerHTML += `<div style="text-align:center"><img src="${url}" style="width:70px;height:90px;object-fit:cover;border-radius:8px"><br><span style="font-size:10px">${f.name.slice(0,12)}</span></div>`;
+async function imageFromURL(url) {
+  const img=new Image();
+  img.crossOrigin='anonymous';
+  img.src=url;
+  await new Promise((resolve,reject)=>{
+    img.onload=resolve;img.onerror=reject;
   });
-  document.getElementById('statusMassal').innerText = `${fotoMassalTerpilih.length} foto dipilih. Tinggal ketik SKU terus klik TEMPEL.`;
-});
+  return img;
+}
 
-function tempelFotoKeSku(){
-  if(!isAdmin) return alert('Hanya Admin!');
-  let sku = document.getElementById('fSkuFoto').value.trim();
-  if(!sku) return alert('Ketik SKU dulu bro! Contoh: 9034926');
-  if(!fotoMassalTerpilih.length) return alert('Pilih foto dulu! Bisa banyak sekaligus.');
-  
-  let barang = DB.find(b=>b.sku==sku);
-  if(!barang){
-    if(!confirm(`SKU ${sku} belum ada di data.xlsx.\nMau tetep tempelin foto ke SKU baru ini? Nanti barangnya dibuatin otomatis.`)) return;
-    // Buat barang baru otomatis biar foto ga nyasar
-    barang = {sku: sku, nama: 'BARANG BARU - '+sku, deskripsi: '', harga: 0, stok: 0, lokasi: ''};
-    DB.push(barang);
+async function offlineSearchMode() {
+  document.getElementById('photoInput').click();
+  closeModal('menuModal');
+}
+
+async function searchByPhoto(e) {
+  const file=e.target.files[0];
+  if(!file)return;
+  const queryImg=new Image();
+  queryImg.src=URL.createObjectURL(file);
+  await new Promise(r=>queryImg.onload=r);
+  const target=getImageFeatures(queryImg);
+
+  const results=[];
+  for(const p of products) {
+    if(!p.foto?.length)continue;
+    try {
+      const img=await imageFromURL(p.foto[0].url);
+      const score=featureSimilarity(target,getImageFeatures(img));
+      results.push({...p,score});
+    } catch(err){}
   }
-  if(!FOTO_DB[sku]) FOTO_DB[sku]=[];
-  let totalAwal = FOTO_DB[sku].length;
-  
-  document.getElementById('statusMassal').innerText = `Lagi nempelin ${fotoMassalTerpilih.length} foto ke ${sku}... tunggu...`;
-  
-  let done = 0;
-  fotoMassalTerpilih.forEach(f=>{
-    let r = new FileReader();
-    r.onload = ev=>{
-      FOTO_DB[sku].push(ev.target.result);
-      done++;
-      if(done===fotoMassalTerpilih.length){
-        saveFotoDB();
-        renderFotoList();
-        render();
-        document.getElementById('statusMassal').innerText = `✅ Berhasil! ${done} foto nempel ke SKU ${sku} (${barang.nama}). Total sekarang ${FOTO_DB[sku].length} foto. Lanjut SKU berikutnya!`;
-        // Reset biar bisa lanjut SKU berikutnya langsung
-        fotoMassalTerpilih = [];
-        document.getElementById('fFotoMassal').value = '';
-        document.getElementById('previewMassal').innerHTML = '';
-        document.getElementById('fSkuFoto').value = '';
-        document.getElementById('fSkuFoto').focus();
-        alert(`Berhasil! ${done} foto nempel ke ${sku}. Cek di detail barang, slidernya udah ada ${FOTO_DB[sku].length} foto.`);
-      }
-    };
-    r.readAsDataURL(f);
-  });
+
+  results.sort((a,b)=>b.score-a.score);
+  renderGrid(results.slice(0,10));
+  document.getElementById('listTitle').textContent='10 Hasil Kemiripan Foto';
+  URL.revokeObjectURL(queryImg.src);
+  e.target.value='';
 }
 
-function renderFotoList(){
-  let sku = document.getElementById('fSkuFoto').value.trim() || (cur ? cur.sku : '') || document.getElementById('fSku').value.trim();
-  // Kalau di Admin lu masih ada input fSku lama, pake itu juga
-  if(!sku) sku = document.getElementById('fSku')?.value.trim();
-  if(!sku){ document.getElementById('fotoList').innerHTML = 'Ketik SKU dulu buat liat fotonya.'; return; }
-  let fotos = FOTO_DB[sku]||[];
-  document.getElementById('fotoList').innerHTML = fotos.map((f,i)=>`<div style="position:relative"><img src="${f}"><br><button onclick="hapusFoto('${sku}',${i})" style="background:#ef4444;color:#fff;border:0;padding:4px 8px;border-radius:6px">Hapus Foto ${i+1}</button></div>`).join('') || 'Belum ada foto untuk SKU '+sku;
+// ================= GEMINI IMAGE SEARCH =================
+async function geminiSearchMode() {
+  closeModal('menuModal');
+  if(!GEMINI_API_KEY||GEMINI_API_KEY==='ISI_API_KEY_DI_SINI')
+    return alert('Masukkan Gemini API Key di konfigurasi index.html');
+  document.getElementById('photoInput').click();
 }
+
+async function searchGemini(file) {
+  const blob=await resizeImage(file);
+  const base64=await new Promise(resolve=>{
+    const reader=new FileReader();
+    reader.onload=()=>resolve(reader.result.split(',')[1]);
+    reader.readAsDataURL(blob);
+  });
+
+  const url=`https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`;
+
+  const response=await fetch(url,{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({
+      contents:[{
+        parts:[
+          {text:'Lihat foto barang toko ini. Balas HANYA JSON: {"nama":"...","warna":"...","ciri":"...","keyword":"..."} Fokus pada warna, bentuk, dan ciri barang. Jangan membaca tulisan atau menggunakan OCR.'},
+          {inline_data:{
+            mime_type:'image/jpeg',
+            data:base64
+          }}
+        ]
+      }]
+    })
+  });
+  if(!response.ok)throw new Error('Gemini API gagal');
+  const result=await response.json();
+  const text=result.candidates[0].content.parts[0].text;
+  const clean=text.replace(/```json|```/g,'').trim();
+  const info=JSON.parse(clean);
+  const keywords=[info.nama,info.warna,info.ciri,info.keyword].filter(Boolean).join(' ');
+  document.getElementById('search').value=keywords;
+  await loadProducts(keywords);
 }
-function hapusFoto(sku,i){ if(!confirm('Hapus foto ini?')) return; FOTO_DB[sku].splice(i,1); saveFotoDB(); renderFotoList(); render(); }
-function uploadExcel(){
-  let f=document.getElementById('excelInput').files[0]; if(!f) return alert('Pilih file Excel/CSV dulu!');
-  let r=new FileReader(); r.onload=ev=>{
-    let wb=XLSX.read(ev.target.result,{type:'array'}); let rows=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);
-    let masuk=0, skip=0;
-    rows.forEach(row=>{
-      let sku=String(row.SKU||row.sku||row.Kode||'').trim(); let nama=row.Nama||row.nama||'';
-      if(!sku||!nama) return;
-      if(DB.some(b=>b.sku==sku)){ skip++; return; }
-      DB.push({sku, nama, deskripsi:row.Deskripsi||row.deskripsi||'', harga:row.Harga||0, stok:row.Stok||0, lokasi:row.Lokasi||''}); masuk++;
-    });
-    document.getElementById('uploadStatus').innerText=`Masuk ${masuk}, Double di-skip ${skip}. Total sekarang ${DB.length}. Jangan lupa Backup!`;
-    render();
-  }; r.readAsArrayBuffer(f);
-}
-function backupData(){
-  let data={tanggal:new Date().toISOString(), barang:DB, foto:FOTO_DB};
-  let blob=new Blob([JSON.stringify(data)],{type:'application/json'});
-  let a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='backup.json'; a.click();
-  alert('Backup didownload. Upload file backup.json ini ke GitHub biar permanen!');
-}
-document.getElementById('restoreInput').addEventListener('change', e=>{
-  let f=e.target.files[0]; if(!f) return;
-  let r=new FileReader(); r.onload=ev=>{ let d=JSON.parse(ev.target.result); DB=d.barang||[]; FOTO_DB=d.foto||{}; saveFotoDB(); render(); alert('Restore berhasil! Total '+DB.length+' barang'); }; r.readAsText(f);
+
+// ================= START =================
+document.getElementById('photoInput').addEventListener('change',async e=>{
+  const file=e.target.files[0];
+  if(!file)return;
+  if(GEMINI_API_KEY!=='ISI_API_KEY_DI_SINI'&&GEMINI_API_KEY) {
+    if(confirm('Gunakan Gemini AI untuk pencarian foto?')) {
+      try {await searchGemini(file)}
+      catch(err){alert(err.message)}
+    } else {
+      await searchByPhoto(e);
+    }
+  } else {
+    await searchByPhoto(e);
+  }
 });
 
-loadExcel();
+function renderAdminState() {
+  document.body.classList.toggle('admin',!!adminPIN);
+}
+
+(async()=>{
+  renderAdminState();
+  await loadProducts();
+  if(products.length)await showDetail(products[0].id);
+})();
+
+if('serviceWorker' in navigator) {
+  window.addEventListener('load',()=>{
+    navigator.serviceWorker.register('/sw.js').catch(console.error);
+  });
+}
 </script>
 </body>
 </html>
