@@ -2,110 +2,338 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>ScanStock v3.5 - Tanpa SKU Kembar</title>
-<script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>ScanStock - Toko</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#111111">
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
-*{box-sizing:border-box}body{margin:0;background:#0f172a;color:#fff;font-family:system-ui;padding:12px}
-.top{display:flex;gap:10px;align-items:center}.logo{font-size:28px}h1{font-size:20px;margin:0}.small{font-size:12px;color:#94a3b8}
-.card2{background:#1e293b;border-radius:14px;padding:12px;margin:10px 0;display:flex;gap:10px;justify-content:space-around;text-align:center}.card2 b{font-size:20px;display:block}
-button{border:0;border-radius:12px;padding:12px 14px;font-weight:800;background:#7c3aed;color:#fff;margin:4px 0}button.ghost{background:#334155}button.green{background:#16a34a}
-input{width:100%;padding:13px;border-radius:12px;border:0;font-size:15px;margin:8px 0;color:#000}
-#grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
-.item{background:#1e293b;border-radius:14px;padding:10px;text-align:center}.item b{display:block;margin:6px 0 2px;font-size:13px}.price{color:#a78bfa;font-weight:800}.box{background:#1e293b;border-radius:14px;padding:14px;margin:10px 0}.hide{display:none}.sku{font-size:11px;color:#94a3b8}.rak{font-size:11px;color:#fbbf24}
-#status{font-size:12px;color:#fbbf24}
+*{box-sizing:border-box} body{margin:0;font-family:system-ui,Arial;background:#f3f3f3;color:#111}
+header{position:sticky;top:0;z-index:20;background:#111;color:#fff;padding:12px 14px;display:flex;justify-content:space-between;align-items:center}
+header b{font-size:18px;letter-spacing:1px} header button{background:#fff;color:#111;border:0;padding:8px 12px;border-radius:999px;font-weight:800}
+.search{padding:12px;display:flex;gap:8px;position:sticky;top:52px;z-index:19;background:#f3f3f3}
+.search input{flex:1;padding:12px;border:1px solid #ddd;border-radius:12px;font-size:15px}
+.search button{padding:12px 14px;border:0;border-radius:12px;font-weight:800}
+.btn-foto{background:#16a34a;color:#fff} .btn-scan{background:#7c3aed;color:#fff}
+.topinfo{padding:0 14px;font-size:12px;color:#666}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:12px}
+.card{background:#fff;border-radius:16px;overflow:hidden;cursor:pointer;border:1px solid #eee}
+.card img{width:100%;aspect-ratio:4/5;object-fit:cover;display:block;background:#eee}
+.card .p{padding:10px} .card .sku{font-size:11px;color:#888} .card .nama{font-weight:800;font-size:14px;line-height:1.2}
+.card .stok{font-size:12px;color:#666;margin-top:4px}
+/* DETAIL - kayak gambar lu */
+.detail{position:fixed;inset:0;background:#fff;z-index:50;overflow:auto;display:none}
+.detail .topbar{display:flex;justify-content:space-between;padding:12px}
+.detail .topbar button{border:0;background:#111;color:#fff;padding:10px 14px;border-radius:999px;font-weight:800}
+.foto-wrap{position:relative;background:#eee}
+.foto-wrap img{width:100%;aspect-ratio:4/5;object-fit:cover;display:block}
+.arrow{position:absolute;top:50%;transform:translateY(-50%);width:44px;height:44px;border-radius:50%;border:0;background:#8b5a2b;color:#fff;font-size:22px;font-weight:900;box-shadow:0 4px 12px rgba(0,0,0,.3)}
+.arrow.l{left:10px} .arrow.r{right:10px}
+.dots{display:flex;gap:6px;justify-content:center;padding:10px}
+.dots i{width:8px;height:8px;border-radius:50%;background:#ddd;display:block} .dots i.on{background:#111}
+.meta{display:flex;justify-content:space-between;padding:0 14px;font-size:12px;color:#666}
+.pdetail{padding:14px} .pdetail h2{font-size:28px;margin:4px 0} .pdetail .label{font-size:11px;letter-spacing:2px;color:#888;font-weight:800}
+.pdetail .desc{line-height:1.5;color:#333;white-space:pre-wrap}
+.row{display:flex;gap:8px;margin-top:12px} .row div{flex:1;background:#f7f7f7;padding:12px;border-radius:12px;text-align:center} .row b{font-size:18px}
+/* ADMIN */
+.admin{position:fixed;inset:0;background:#fff;z-index:60;overflow:auto;display:none;padding:16px}
+.admin input,.admin textarea,.admin select{width:100%;padding:12px;margin:6px 0;border:1px solid #ddd;border-radius:10px}
+.admin button{padding:12px;border:0;border-radius:10px;font-weight:800;margin:4px 0}
+.b-green{background:#16a34a;color:#fff} .b-dark{background:#111;color:#fff} .b-red{background:#ef4444;color:#fff} .b-grey{background:#eee}
+.foto-mini{display:flex;gap:8px;flex-wrap:wrap} .foto-mini img{width:80px;height:100px;object-fit:cover;border-radius:10px}
+.hidden{display:none!important}
 </style>
 </head>
 <body>
-<div class="top"><div class="logo">📦</div><div><h1>ScanStock v3.5</h1><div class="small">Cari Barang + Foto + Barcode - Tanpa SKU Kembar</div></div></div>
-<div class="card2"><div><b id="jml">0</b>Barang</div><div><b id="jmlTampil">0</b>Ditemukan</div><div><b id="jmlStok">0</b>Total Stok</div></div>
-<div id="status" class="box">⏳ Loading data.xlsx... Tunggu sebentar...</div>
-<input id="searchInput" placeholder="Cari barang / SKU / Rak..." oninput="tampil()">
-<div><button onclick="scanBarcode()">📷 SCAN BARCODE</button> <button onclick="document.getElementById('fileFoto').click()" class="green">🖼️ CARI PAKAI FOTO v3.5</button></div>
-<input type="file" id="fileFoto" accept="image/*" onchange="cariFoto(this)" class="hide">
-<div id="hasilFoto" class="box hide"></div>
-<div id="grid"></div>
-<div id="kosong" class="box">Belum ada data. Pastikan file data.xlsx sudah di-upload ke GitHub.</div>
+<header><b>SCANSTOCK</b><button onclick="openAdmin()">☰ MENU</button></header>
+
+<div class="search">
+<input id="q" placeholder="Cari SKU / Nama / Deskripsi... misal 9034926 / PILLOW / bantal ayam" oninput="render()">
+<button class="btn-foto" onclick="document.getElementById('fotoInput').click()">🖼️ FOTO</button>
+<button class="btn-scan" onclick="alert('Scan Barcode: arahkan kamera ke barcode')">📷 SCAN</button>
+<input type="file" id="fotoInput" accept="image/*" class="hidden">
+</div>
+<div class="topinfo" id="topinfo">Memuat data.xlsx dari GitHub...</div>
+<div class="grid" id="grid"></div>
+
+<!-- DETAIL -->
+<div class="detail" id="detail">
+  <div class="topbar"><button onclick="closeDetail()">← Kembali</button><button onclick="editCurrent()">✏️ Edit (Admin)</button></div>
+  <div class="foto-wrap">
+    <img id="dFoto" src="">
+    <button class="arrow l" onclick="geserFoto(-1)">←</button>
+    <button class="arrow r" onclick="geserFoto(1)">→</button>
+  </div>
+  <div class="dots" id="dots"></div>
+  <div class="meta"><span id="dCount">0 foto</span><span id="dEmbed">Embedding siap dicari</span></div>
+  <div class="pdetail">
+    <div class="label">PRODUCT DETAIL</div>
+    <h2 id="dSku">-</h2>
+    <div id="dNama" style="font-size:18px;font-weight:700"></div>
+    <div class="desc" id="dDesc" style="margin-top:10px"></div>
+    <div class="row"><div><span style="font-size:11px;color:#888">STOK</span><br><b id="dStok">0</b></div><div><span style="font-size:11px;color:#888">HARGA</span><br><b id="dHarga">0</b></div><div><span style="font-size:11px;color:#888">LOKASI</span><br><b id="dLokasi">-</b></div></div>
+  </div>
+</div>
+
+<!-- ADMIN -->
+<div class="admin" id="admin">
+  <div style="display:flex;justify-content:space-between;align-items:center"><h2>Menu Admin</h2><button class="b-dark" onclick="closeAdmin()">X Tutup</button></div>
+  <div id="loginBox">
+    <p>Masukin PIN Admin. Kasir tidak bisa edit.</p>
+    <input type="password" id="pinInput" placeholder="PIN Admin (default 123456)">
+    <button class="b-dark" style="width:100%" onclick="loginAdmin()">Masuk Admin</button>
+  </div>
+  <div id="adminBox" class="hidden">
+    <h3>➕ Tambah / Edit Barang</h3>
+    <input id="fSku" placeholder="SKU * contoh 9034926">
+    <input id="fNama" placeholder="Nama * contoh PILLOW">
+    <textarea id="fDesc" placeholder="Deskripsi - contoh Bantal ayam kuning, 5 design, bahan katun"></textarea>
+    <input id="fHarga" type="number" placeholder="Harga">
+    <input id="fStok" type="number" placeholder="Stok">
+    <input id="fLokasi" placeholder="Lokasi Rak - contoh Rak A2">
+    <button class="b-green" style="width:100%" onclick="saveBarang()">💾 Simpan Barang</button>
+    <h3>🖼️ Foto Barang (Bisa Banyak)</h3>
+    <p style="font-size:12px;color:#666">1 SKU bisa banyak foto. Foto pertama jadi foto utama. Geser di detail buat liat design lain.</p>
+    <input type="file" id="fFoto" accept="image/*" multiple>
+    <button class="b-dark" style="width:100%" onclick="uploadFoto()">Upload Foto Terpilih</button>
+    <div class="foto-mini" id="fotoList"></div>
+    <h3>📥 Upload Excel / CSV</h3>
+    <p style="font-size:12px;color:#666">Kalau SKU sudah ada, otomatis di-skip. Ga akan double.</p>
+    <input type="file" id="excelInput" accept=".xlsx,.xls,.csv">
+    <button class="b-dark" style="width:100%" onclick="uploadExcel()">Upload Excel / CSV</button>
+    <div id="uploadStatus" style="font-size:12px;margin-top:6px"></div>
+    <h3>💾 Backup / Restore</h3>
+    <button class="b-green" onclick="backupData()">⬇️ Backup Barang + Foto</button>
+    <button class="b-grey" onclick="document.getElementById('restoreInput').click()">⬆️ Restore Backup</button>
+    <input type="file" id="restoreInput" accept=".json" class="hidden">
+    <p style="font-size:12px;color:#666">Backup ini simpen di GitHub juga sebagai <b>backup.json</b> biar permanen. Caranya: abis download, upload file backup.json itu ke repo GitHub lu kayak upload data.xlsx kemarin.</p>
+    <button class="b-red" style="width:100%" onclick="logoutAdmin()">Keluar Admin</button>
+  </div>
+</div>
+
 <script>
-let barang=[];
-async function loadData(){
+let DB = []; // dari data.xlsx
+let FOTO_DB = {}; // sku -> [dataURL,...] disimpen di IndexedDB biar permanen di HP + bisa di-backup
+let cur = null, curFotoIdx = 0, isAdmin = false;
+const ADMIN_PIN = "123456";
+const DB_NAME = 'scanstock_github_v4';
+
+// --- LOAD data.xlsx DARI GITHUB (repo yang sama) ---
+async function loadExcel(){
   try{
-    let r=await fetch('data.xlsx');
-    if(!r.ok) throw new Error('data.xlsx tidak ketemu');
-    let buf=await r.arrayBuffer();
-    let wb=XLSX.read(buf,{type:'array'});
-    let ws=wb.Sheets[wb.SheetNames[0]];
-    let rows=XLSX.utils.sheet_to_json(ws,{header:1,defval:''});
-    barang=[];
-    let sudahAda=new Set();
-    let dibuang=0;
-    for(let i=1;i<rows.length;i++){
-      let row=rows[i];
-      let sku=String(row[0]||'').trim();
-      let nama=String(row[1]||row[2]||'').trim();
-      if(!nama && !sku) continue;
-      // SKU KEMBAR JANGAN DIAJAK - kalau udah ada, skip
-      if(sku){
-        if(sudahAda.has(sku)){ dibuang++; continue; }
-        sudahAda.add(sku);
-      }
-      let harga=Number(row[3])||0;
-      let stok=Number(row[4])||0;
-      let rak=String(row[5]||'').trim();
-      barang.push({id:i,sku:sku,nama:nama,harga:harga,stok:stok,rak:rak});
-    }
-    document.getElementById('status').innerHTML='✅ Data ke-load: <b>'+barang.length+' barang</b> | SKU kembar dibuang: '+dibuang+' | Dari total baris: '+(rows.length-1);
-    document.getElementById('jml').innerText=barang.length;
-    document.getElementById('jmlStok').innerText=barang.reduce((a,b)=>a+Number(b.stok||0),0);
-    tampil();
+    const res = await fetch('data.xlsx');
+    if(!res.ok) throw new Error('data.xlsx ga ketemu');
+    const buf = await res.arrayBuffer();
+    const wb = XLSX.read(buf, {type:'array'});
+    const rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);
+    // ANTI DOUBLE SKU
+    let map = new Map(), skip=0;
+    rows.forEach(r=>{
+      let sku = String(r.SKU || r.sku || r.Kode || r['Kode Barang'] || r['KODE'] || '').trim();
+      let nama = r.Nama || r.nama || r['Nama Barang'] || r.NAMA || '';
+      if(!sku || !nama) return;
+      if(map.has(sku)){ skip++; return; } // skip double
+      map.set(sku, {
+        sku, nama,
+        deskripsi: r.Deskripsi || r.deskripsi || r.DESKRIPSI || r['Deskripsi Barang'] || '',
+        harga: r.Harga || r.harga || r.HARGA || 0,
+        stok: r.Stok || r.stok || r.STOK || r.Qty || 0,
+        lokasi: r.Lokasi || r.lokasi || r.Rak || ''
+      });
+    });
+    DB = [...map.values()];
+    document.getElementById('topinfo').innerText = `✅ Data ke-load: ${DB.length} barang | SKU kembar dibuang: ${skip} | Dari GitHub`;
+    render();
   }catch(e){
-    document.getElementById('status').innerHTML='❌ Gagal load: '+e.message+'<br>Pastikan file namanya <b>data.xlsx</b> dan satu folder dengan index.html';
+    document.getElementById('topinfo').innerText = '⚠️ data.xlsx belum ketemu di GitHub. Upload data.xlsx dulu kayak kemarin.';
   }
+  loadFotoDB();
 }
-function tampil(){
-  let q=document.getElementById('searchInput').value.toLowerCase().trim();
-  let g=document.getElementById('grid');
-  g.innerHTML='';
-  let list=barang;
-  if(q) list=barang.filter(b=>(b.nama+' '+b.sku+' '+b.rak).toLowerCase().includes(q));
-  document.getElementById('jmlTampil').innerText=list.length;
-  document.getElementById('kosong').style.display=list.length?'none':'block';
-  list.slice(0,200).forEach(b=>{
-    let d=document.createElement('div');d.className='item';
-    d.innerHTML='<b>'+b.nama+'</b><div class="sku">SKU: '+b.sku+'</div><div class="price">Rp '+Number(b.harga).toLocaleString('id-ID')+'</div><div>Stok: '+b.stok+'</div><div class="rak">📍 '+(b.rak||'-')+'</div>';
-    g.appendChild(d);
+
+// --- FOTO: IndexedDB ---
+function loadFotoDB(){
+  let req = indexedDB.open(DB_NAME,1);
+  req.onupgradeneeded = e=>{ e.target.result.createObjectStore('foto'); };
+  req.onsuccess = e=>{
+    let db=e.target.result;
+    let tx=db.transaction('foto','readonly'); let st=tx.objectStore('foto');
+    let r=st.get('all'); r.onsuccess=()=>{ FOTO_DB = r.result || {}; render(); };
+  };
+}
+function saveFotoDB(){
+  let req=indexedDB.open(DB_NAME,1);
+  req.onsuccess=e=>{ let db=e.target.result; let tx=db.transaction('foto','readwrite'); tx.objectStore('foto').put(FOTO_DB,'all'); };
+}
+
+// --- RENDER LIST ---
+function render(){
+  let q = document.getElementById('q').value.toLowerCase();
+  let list = DB.filter(b => !q || b.sku.toLowerCase().includes(q) || b.nama.toLowerCase().includes(q) || (b.deskripsi||'').toLowerCase().includes(q));
+  document.getElementById('grid').innerHTML = list.slice(0,100).map(b=>{
+    let fotos = FOTO_DB[b.sku] || [];
+    let img = fotos[0] || 'https://via.placeholder.com/400x500?text=No+Foto';
+    return `<div class="card" onclick="openDetail('${b.sku}')"><img src="${img}"><div class="p"><div class="sku">SKU ${b.sku} • ${fotos.length} foto</div><div class="nama">${b.nama}</div><div class="stok">Stok: ${b.stok} • ${b.lokasi||''}</div></div></div>`;
+  }).join('') || '<p style="padding:14px">Barang ga ketemu. Coba kata lain.</p>';
+}
+
+// --- DETAIL + SLIDER ---
+function openDetail(sku){
+  cur = DB.find(b=>b.sku==sku); if(!cur) return;
+  curFotoIdx=0; updateDetail();
+  document.getElementById('detail').style.display='block';
+}
+function updateDetail(){
+  let fotos = FOTO_DB[cur.sku] || [];
+  document.getElementById('dFoto').src = fotos[curFotoIdx] || 'https://via.placeholder.com/400x500?text=No+Foto';
+  document.getElementById('dSku').innerText = cur.sku;
+  document.getElementById('dNama').innerText = cur.nama;
+  document.getElementById('dDesc').innerText = cur.deskripsi || '-';
+  document.getElementById('dStok').innerText = cur.stok;
+  document.getElementById('dHarga').innerText = cur.harga;
+  document.getElementById('dLokasi').innerText = cur.lokasi || '-';
+  document.getElementById('dCount').innerText = `${fotos.length} foto • Foto ${fotos.length?curFotoIdx+1:0} dari ${fotos.length}`;
+  document.getElementById('dots').innerHTML = fotos.map((_,i)=>`<i class="${i===curFotoIdx?'on':''}"></i>`).join('');
+}
+function geserFoto(d){
+  let fotos = FOTO_DB[cur.sku] || []; if(!fotos.length) return;
+  curFotoIdx = (curFotoIdx + d + fotos.length) % fotos.length;
+  updateDetail();
+}
+function closeDetail(){ document.getElementById('detail').style.display='none'; }
+
+// --- CARI BY FOTO: VISUAL SEARCH (BUKAN OCR) - dari HTML lu dulu ---
+function getImageFeatures(dataUrl, cb){
+  let img=new Image();
+  img.onload=()=>{
+    let S=32; let c=document.createElement('canvas'); c.width=S; c.height=S;
+    let ctx=c.getContext('2d'); ctx.drawImage(img,0,0,S,S);
+    let d=ctx.getImageData(0,0,S,S).data;
+    let colorHist=new Array(512).fill(0), edgeOrient=new Array(8).fill(0), gridEdge=new Array(16).fill(0), gridColor=new Array(48).fill(0), centerHist=new Array(64).fill(0);
+    let gray=new Float32Array(S*S);
+    for(let y=0;y<S;y++) for(let x=0;x<S;x++){
+      let i=(y*S+x)*4; let r=d[i],g=d[i+1],b=d[i+2];
+      let ri=Math.min(7,Math.floor(r/32)), gi=Math.min(7,Math.floor(g/32)), bi=Math.min(7,Math.floor(b/32));
+      colorHist[ri*64+gi*8+bi]++; gray[y*S+x]=(r+g+b)/3;
+      let gx=Math.min(3,Math.floor(x/8)), gy=Math.min(3,Math.floor(y/8)); let gi2=(gy*4+gx)*3; gridColor[gi2]+=r; gridColor[gi2+1]+=g; gridColor[gi2+2]+=b;
+      if(x>=8&&x<24&&y>=8&&y<24){ let cri=Math.min(3,Math.floor(r/64)),cgi=Math.min(3,Math.floor(g/64)),cbi=Math.min(3,Math.floor(b/64)); centerHist[cri*16+cgi*4+cbi]++; }
+    }
+    for(let i=0;i<512;i++) colorHist[i]/=(S*S);
+    for(let i=0;i<64;i++) centerHist[i]/=256;
+    for(let i=0;i<48;i++) gridColor[i]/=(64*255);
+    for(let y=1;y<S-1;y++) for(let x=1;x<S-1;x++){
+      let gx=-gray[(y-1)*S+x-1]-2*gray[y*S+x-1]-gray[(y+1)*S+x-1]+gray[(y-1)*S+x+1]+2*gray[y*S+x+1]+gray[(y+1)*S+x+1];
+      let gy=-gray[(y-1)*S+x-1]-2*gray[(y-1)*S+x]-gray[(y-1)*S+x+1]+gray[(y+1)*S+x-1]+2*gray[(y+1)*S+x]+gray[(y+1)*S+x+1];
+      let mag=Math.sqrt(gx*gx+gy*gy);
+      if(mag>30){ let ang=Math.atan2(gy,gx); let bin=Math.floor((ang+Math.PI)/(Math.PI*2)*8)%8; edgeOrient[bin]+=mag; let gx2=Math.min(3,Math.floor(x/8)), gy2=Math.min(3,Math.floor(y/8)); gridEdge[gy2*4+gx2]+=mag; }
+    }
+    let sE=edgeOrient.reduce((a,b)=>a+b,0)||1; for(let i=0;i<8;i++) edgeOrient[i]/=sE;
+    let sG=gridEdge.reduce((a,b)=>a+b,0)||1; for(let i=0;i<16;i++) gridEdge[i]/=sG;
+    cb({color:colorHist,edge:edgeOrient,grid:gridEdge,gridColor:gridColor,center:centerHist});
+  }; img.src=dataUrl;
+}
+function featureSimilarity(f1,f2){
+  function dist(a,b){let s=0; for(let i=0;i<a.length;i++){let d=a[i]-b[i]; s+=d*d;} return Math.sqrt(s);}
+  let cs=Math.max(0,1-dist(f1.color,f2.color)/0.35);
+  let ce=Math.max(0,1-dist(f1.center,f2.center)/0.5);
+  let es=Math.max(0,1-dist(f1.edge,f2.edge)/0.6);
+  let gs=Math.max(0,1-dist(f1.grid,f2.grid)/0.7);
+  let gcs=Math.max(0,1-dist(f1.gridColor,f2.gridColor)/1.5);
+  return Math.round((cs*0.25+ce*0.30+es*0.20+gs*0.10+gcs*0.15)*100); // Warna 40 + Bentuk 40 + Tekstur 20 versi fix
+}
+document.getElementById('fotoInput').addEventListener('change', e=>{
+  let f=e.target.files[0]; if(!f) return;
+  let r=new FileReader(); r.onload=ev=>{
+    getImageFeatures(ev.target.result, hashCari=>{
+      let scored=[];
+      let allSkus = Object.keys(FOTO_DB);
+      let done=0;
+      if(!allSkus.length){ alert('Belum ada foto barang yang disimpen. Masukin foto dulu di Admin.'); return; }
+      allSkus.forEach(sku=>{
+        let fotoUtama = FOTO_DB[sku][0];
+        getImageFeatures(fotoUtama, h2=>{
+          let skor = featureSimilarity(hashCari,h2);
+          let barang = DB.find(b=>b.sku==sku);
+          if(barang) scored.push({barang, skor});
+          done++; if(done===allSkus.length){
+            scored.sort((a,b)=>b.skor-a.skor);
+            let top = scored.slice(0,8);
+            let teks = top.map(t=>`${t.barang.nama} (${t.barang.sku}) - ${t.skor}%`).join('\n');
+            if(confirm('Paling mirip:\n'+teks+'\n\nBuka yang paling mirip?')) openDetail(top[0].barang.sku);
+          }
+        });
+      });
+    });
+  }; r.readAsDataURL(f);
+});
+
+// --- ADMIN ---
+function openAdmin(){ document.getElementById('admin').style.display='block'; }
+function closeAdmin(){ document.getElementById('admin').style.display='none'; }
+function loginAdmin(){
+  if(document.getElementById('pinInput').value === ADMIN_PIN){
+    isAdmin=true; document.getElementById('loginBox').classList.add('hidden'); document.getElementById('adminBox').classList.remove('hidden');
+  } else alert('PIN salah!');
+}
+function logoutAdmin(){ isAdmin=false; document.getElementById('loginBox').classList.remove('hidden'); document.getElementById('adminBox').classList.add('hidden'); closeAdmin(); }
+function editCurrent(){
+  if(!isAdmin){ alert('Hanya Admin yang bisa edit. Klik Menu -> masukin PIN.'); openAdmin(); return; }
+  document.getElementById('fSku').value=cur.sku; document.getElementById('fNama').value=cur.nama; document.getElementById('fDesc').value=cur.deskripsi; document.getElementById('fHarga').value=cur.harga; document.getElementById('fStok').value=cur.stok; document.getElementById('fLokasi').value=cur.lokasi;
+  closeDetail(); openAdmin(); renderFotoList();
+}
+function saveBarang(){
+  if(!isAdmin) return alert('Hanya Admin!');
+  let sku=document.getElementById('fSku').value.trim();
+  if(!sku) return alert('SKU wajib!');
+  if(DB.some(b=>b.sku==sku && cur && b.sku!=cur.sku)) return alert('SKU '+sku+' sudah ada! Ga boleh double.');
+  let data={sku, nama:document.getElementById('fNama').value, deskripsi:document.getElementById('fDesc').value, harga:document.getElementById('fHarga').value, stok:document.getElementById('fStok').value, lokasi:document.getElementById('fLokasi').value};
+  let idx=DB.findIndex(b=>b.sku==sku);
+  if(idx>=0) DB[idx]=data; else DB.push(data);
+  alert('Disimpen! Jangan lupa Backup + upload backup.json ke GitHub biar permanen.');
+  render();
+}
+function renderFotoList(){
+  let sku=document.getElementById('fSku').value; if(!sku) return;
+  let fotos=FOTO_DB[sku]||[];
+  document.getElementById('fotoList').innerHTML=fotos.map((f,i)=>`<div><img src="${f}"><br><button onclick="hapusFoto('${sku}',${i})">Hapus</button></div>`).join('')||'Belum ada foto';
+}
+function uploadFoto(){
+  if(!isAdmin) return;
+  let sku=document.getElementById('fSku').value.trim(); if(!sku) return alert('Isi SKU dulu!');
+  let files=document.getElementById('fFoto').files; if(!files.length) return alert('Pilih foto dulu!');
+  if(!FOTO_DB[sku]) FOTO_DB[sku]=[];
+  let done=0;
+  [...files].forEach(f=>{
+    let r=new FileReader(); r.onload=ev=>{ FOTO_DB[sku].push(ev.target.result); done++; if(done===files.length){ saveFotoDB(); renderFotoList(); render(); alert('Foto masuk! Total '+FOTO_DB[sku].length+' foto untuk SKU '+sku); } }; r.readAsDataURL(f);
   });
-  if(list.length>200) g.innerHTML+='<div class="box">Menampilkan 200 dari '+list.length+' hasil. Ketik lebih spesifik untuk mempersempit.</div>';
 }
-function scanBarcode(){
-  let kode=prompt('Scan / Ketik Barcode / SKU:');
-  if(!kode) return;
-  document.getElementById('searchInput').value=kode;
-  tampil();
-  let ketemu=barang.filter(b=>b.sku==kode.trim());
-  if(ketemu.length) alert('Ketemu: '+ketemu[0].nama+' - Rp '+ketemu[0].harga);
-  else alert('SKU '+kode+' tidak ketemu di '+barang.length+' barang.');
+function hapusFoto(sku,i){ if(!confirm('Hapus foto ini?')) return; FOTO_DB[sku].splice(i,1); saveFotoDB(); renderFotoList(); render(); }
+function uploadExcel(){
+  let f=document.getElementById('excelInput').files[0]; if(!f) return alert('Pilih file Excel/CSV dulu!');
+  let r=new FileReader(); r.onload=ev=>{
+    let wb=XLSX.read(ev.target.result,{type:'array'}); let rows=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);
+    let masuk=0, skip=0;
+    rows.forEach(row=>{
+      let sku=String(row.SKU||row.sku||row.Kode||'').trim(); let nama=row.Nama||row.nama||'';
+      if(!sku||!nama) return;
+      if(DB.some(b=>b.sku==sku)){ skip++; return; }
+      DB.push({sku, nama, deskripsi:row.Deskripsi||row.deskripsi||'', harga:row.Harga||0, stok:row.Stok||0, lokasi:row.Lokasi||''}); masuk++;
+    });
+    document.getElementById('uploadStatus').innerText=`Masuk ${masuk}, Double di-skip ${skip}. Total sekarang ${DB.length}. Jangan lupa Backup!`;
+    render();
+  }; r.readAsArrayBuffer(f);
 }
-async function cariFoto(el){
-  if(!el.files[0]) return;
-  let box=document.getElementById('hasilFoto');box.classList.remove('hide');
-  box.innerHTML='⏳ v3.5 lagi baca foto... (OCR)';
-  try{
-    let res=await Tesseract.recognize(el.files[0],'eng');
-    let teks=res.data.text.trim();
-    box.innerHTML='<b>Hasil baca foto (v3.5):</b><br>'+(teks||'(tidak ada teks terbaca)')+'<br><br><button onclick="pakaiHasilFoto()">Cari di database</button>';
-    window._teksFoto=teks;
-  }catch(e){ box.innerHTML='Gagal baca foto: '+e.message; }
+function backupData(){
+  let data={tanggal:new Date().toISOString(), barang:DB, foto:FOTO_DB};
+  let blob=new Blob([JSON.stringify(data)],{type:'application/json'});
+  let a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='backup.json'; a.click();
+  alert('Backup didownload. Upload file backup.json ini ke GitHub biar permanen!');
 }
-function pakaiHasilFoto(){
-  let t=(window._teksFoto||'').split('\n')[0]||'';
-  let kata=t.split(' ').sort((a,b)=>b.length-a.length)[0]||t;
-  document.getElementById('searchInput').value=kata;
-  tampil();
-  document.getElementById('hasilFoto').innerHTML+='<br>🔍 Dicari: <b>'+kata+'</b>';
-}
-loadData();
+document.getElementById('restoreInput').addEventListener('change', e=>{
+  let f=e.target.files[0]; if(!f) return;
+  let r=new FileReader(); r.onload=ev=>{ let d=JSON.parse(ev.target.result); DB=d.barang||[]; FOTO_DB=d.foto||{}; saveFotoDB(); render(); alert('Restore berhasil! Total '+DB.length+' barang'); }; r.readAsText(f);
+});
+
+loadExcel();
 </script>
 </body>
 </html>
