@@ -92,10 +92,17 @@ header b{font-size:18px;letter-spacing:1px} header button{background:#fff;color:
     <input id="fStok" type="number" placeholder="Stok">
     <input id="fLokasi" placeholder="Lokasi Rak - contoh Rak A2">
     <button class="b-green" style="width:100%" onclick="saveBarang()">💾 Simpan Barang</button>
-    <h3>🖼️ Foto Barang (Bisa Banyak)</h3>
-    <p style="font-size:12px;color:#666">1 SKU bisa banyak foto. Foto pertama jadi foto utama. Geser di detail buat liat design lain.</p>
-    <input type="file" id="fFoto" accept="image/*" multiple>
-    <button class="b-dark" style="width:100%" onclick="uploadFoto()">Upload Foto Terpilih</button>
+    <h3>🖼️ Upload Foto Massal - Tanpa Rename</h3>
+<p style="font-size:12px;color:#666">Caranya: 1. Ketik SKU dulu, 2. Pilih banyak foto, 3. Klik TEMPEL. Foto langsung nempel jadi slider.</p>
+
+<input id="fSkuFoto" placeholder="Ketik SKU-nya dulu - contoh 9034926" style="border:2px solid #111;font-weight:800;font-size:16px">
+<input type="file" id="fFotoMassal" accept="image/*" multiple>
+<div id="previewMassal" style="display:flex;gap:8px;flex-wrap:wrap;margin:8px 0"></div>
+<button class="b-green" style="width:100%;font-size:16px;padding:14px" onclick="tempelFotoKeSku()">📸 TEMPEL SEMUA FOTO KE SKU INI</button>
+<div id="statusMassal" style="font-size:12px;margin-top:6px"></div>
+
+<div class="foto-mini" id="fotoList"></div>
+<button class="b-grey" onclick="renderFotoList()">🔄 Lihat Foto Yang Sudah Nempel</button>
     <div class="foto-mini" id="fotoList"></div>
     <h3>📥 Upload Excel / CSV</h3>
     <p style="font-size:12px;color:#666">Kalau SKU sudah ada, otomatis di-skip. Ga akan double.</p>
@@ -296,15 +303,71 @@ function renderFotoList(){
   let fotos=FOTO_DB[sku]||[];
   document.getElementById('fotoList').innerHTML=fotos.map((f,i)=>`<div><img src="${f}"><br><button onclick="hapusFoto('${sku}',${i})">Hapus</button></div>`).join('')||'Belum ada foto';
 }
-function uploadFoto(){
-  if(!isAdmin) return;
-  let sku=document.getElementById('fSku').value.trim(); if(!sku) return alert('Isi SKU dulu!');
-  let files=document.getElementById('fFoto').files; if(!files.length) return alert('Pilih foto dulu!');
-  if(!FOTO_DB[sku]) FOTO_DB[sku]=[];
-  let done=0;
-  [...files].forEach(f=>{
-    let r=new FileReader(); r.onload=ev=>{ FOTO_DB[sku].push(ev.target.result); done++; if(done===files.length){ saveFotoDB(); renderFotoList(); render(); alert('Foto masuk! Total '+FOTO_DB[sku].length+' foto untuk SKU '+sku); } }; r.readAsDataURL(f);
+// PART 3 FIX: Upload Massal Tanpa Rename - Ketik SKU, Langsung Nempel
+let fotoMassalTerpilih = [];
+
+// Preview pas pilih foto
+document.getElementById('fFotoMassal').addEventListener('change', e=>{
+  fotoMassalTerpilih = [...e.target.files];
+  let preview = document.getElementById('previewMassal');
+  preview.innerHTML = '';
+  fotoMassalTerpilih.forEach(f=>{
+    let url = URL.createObjectURL(f);
+    preview.innerHTML += `<div style="text-align:center"><img src="${url}" style="width:70px;height:90px;object-fit:cover;border-radius:8px"><br><span style="font-size:10px">${f.name.slice(0,12)}</span></div>`;
   });
+  document.getElementById('statusMassal').innerText = `${fotoMassalTerpilih.length} foto dipilih. Tinggal ketik SKU terus klik TEMPEL.`;
+});
+
+function tempelFotoKeSku(){
+  if(!isAdmin) return alert('Hanya Admin!');
+  let sku = document.getElementById('fSkuFoto').value.trim();
+  if(!sku) return alert('Ketik SKU dulu bro! Contoh: 9034926');
+  if(!fotoMassalTerpilih.length) return alert('Pilih foto dulu! Bisa banyak sekaligus.');
+  
+  let barang = DB.find(b=>b.sku==sku);
+  if(!barang){
+    if(!confirm(`SKU ${sku} belum ada di data.xlsx.\nMau tetep tempelin foto ke SKU baru ini? Nanti barangnya dibuatin otomatis.`)) return;
+    // Buat barang baru otomatis biar foto ga nyasar
+    barang = {sku: sku, nama: 'BARANG BARU - '+sku, deskripsi: '', harga: 0, stok: 0, lokasi: ''};
+    DB.push(barang);
+  }
+  if(!FOTO_DB[sku]) FOTO_DB[sku]=[];
+  let totalAwal = FOTO_DB[sku].length;
+  
+  document.getElementById('statusMassal').innerText = `Lagi nempelin ${fotoMassalTerpilih.length} foto ke ${sku}... tunggu...`;
+  
+  let done = 0;
+  fotoMassalTerpilih.forEach(f=>{
+    let r = new FileReader();
+    r.onload = ev=>{
+      FOTO_DB[sku].push(ev.target.result);
+      done++;
+      if(done===fotoMassalTerpilih.length){
+        saveFotoDB();
+        renderFotoList();
+        render();
+        document.getElementById('statusMassal').innerText = `✅ Berhasil! ${done} foto nempel ke SKU ${sku} (${barang.nama}). Total sekarang ${FOTO_DB[sku].length} foto. Lanjut SKU berikutnya!`;
+        // Reset biar bisa lanjut SKU berikutnya langsung
+        fotoMassalTerpilih = [];
+        document.getElementById('fFotoMassal').value = '';
+        document.getElementById('previewMassal').innerHTML = '';
+        document.getElementById('fSkuFoto').value = '';
+        document.getElementById('fSkuFoto').focus();
+        alert(`Berhasil! ${done} foto nempel ke ${sku}. Cek di detail barang, slidernya udah ada ${FOTO_DB[sku].length} foto.`);
+      }
+    };
+    r.readAsDataURL(f);
+  });
+}
+
+function renderFotoList(){
+  let sku = document.getElementById('fSkuFoto').value.trim() || (cur ? cur.sku : '') || document.getElementById('fSku').value.trim();
+  // Kalau di Admin lu masih ada input fSku lama, pake itu juga
+  if(!sku) sku = document.getElementById('fSku')?.value.trim();
+  if(!sku){ document.getElementById('fotoList').innerHTML = 'Ketik SKU dulu buat liat fotonya.'; return; }
+  let fotos = FOTO_DB[sku]||[];
+  document.getElementById('fotoList').innerHTML = fotos.map((f,i)=>`<div style="position:relative"><img src="${f}"><br><button onclick="hapusFoto('${sku}',${i})" style="background:#ef4444;color:#fff;border:0;padding:4px 8px;border-radius:6px">Hapus Foto ${i+1}</button></div>`).join('') || 'Belum ada foto untuk SKU '+sku;
+}
 }
 function hapusFoto(sku,i){ if(!confirm('Hapus foto ini?')) return; FOTO_DB[sku].splice(i,1); saveFotoDB(); renderFotoList(); render(); }
 function uploadExcel(){
